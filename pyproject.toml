@@ -1,0 +1,9 @@
+[project]
+name = "dividend-rotation-pwa"
+version = "0.1.0"
+description = "512890 dividend low-volatility ETF signal Streamlit PWA"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

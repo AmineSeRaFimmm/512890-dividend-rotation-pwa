@@ -1,0 +1,32 @@
+{
+  "capital": 100000,
+  "symbol_trade": "512890",
+  "symbol_tech": "588000",
+  "position_ladder": {
+    "S0": 0.0,
+    "S1": 0.2,
+    "S2": 0.4,
+    "S3": 0.7,
+    "S4": 1.0
+  },
+  "thresholds": {
+    "r_absorb": 1.75,
+    "r_warning": 1.70,
+    "r_confirm": 1.64,
+    "r_strong": 1.59,
+    "clv_weak": 0.30,
+    "clv_support": 0.60,
+    "clv_strong": 0.70,
+    "buy_gap_normal": 0.008,
+    "buy_gap_max": 0.015,
+    "abnormal_drop": -0.03,
+    "cooldown_whipsaw_window": 10,
+    "cooldown_days": 5
+  },
+  "stop_loss": {
+    "S1": -0.03,
+    "S2": -0.04,
+    "S3": -0.05,
+    "S4": -0.06
+  }
+}

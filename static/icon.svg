@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="512890 Signals">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#EAF2F8"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#7A9CC6"/>
+      <stop offset="1" stop-color="#7AAE9F"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <rect x="72" y="84" width="368" height="344" rx="54" fill="rgba(255,255,255,0.72)" stroke="#D7E3EC" stroke-width="8"/>
+  <path d="M112 324 C164 300 179 245 224 258 C263 269 268 326 316 302 C354 283 374 226 404 203" fill="none" stroke="url(#line)" stroke-width="28" stroke-linecap="round"/>
+  <circle cx="404" cy="203" r="18" fill="#7AAE9F"/>
+  <text x="256" y="166" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif" font-size="62" font-weight="700" fill="#1F2937">512890</text>
+  <text x="256" y="385" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif" font-size="34" font-weight="600" fill="#6B7280">Signals</text>
+</svg>

@@ -1,0 +1,71 @@
+name: Update Daily 512890 Signal
+
+on:
+  schedule:
+    # 18:15 Asia/Shanghai, after A-share market data should be settled.
+    - cron: "15 10 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      offline_sample:
+        description: "Use bundled sample data instead of live market fetch"
+        required: false
+        type: boolean
+        default: false
+      end_date:
+        description: "Optional YYYY-MM-DD end date for reproducible manual runs"
+        required: false
+        type: string
+
+concurrency:
+  group: daily-512890-signal
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Update daily signal snapshot
+        run: |
+          ARGS=""
+          if [ "${{ inputs.offline_sample }}" = "true" ]; then
+            ARGS="$ARGS --offline-sample"
+          fi
+          if [ -n "${{ inputs.end_date }}" ]; then
+            ARGS="$ARGS --end-date ${{ inputs.end_date }}"
+          fi
+          python scripts/update_daily_snapshot.py $ARGS
+
+      - name: Run tests
+        run: pytest -q
+
+      - name: Commit updated data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/live_prices.csv data/latest_signal.json data/auto_portfolio.json data/signal_history.csv data/update_log.json
+          if git diff --cached --quiet; then
+            echo "No data changes to commit."
+          else
+            git commit -m "chore: update daily 512890 signal snapshot"
+            git push
+          fi

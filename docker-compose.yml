@@ -1,0 +1,9 @@
+services:
+  streamlit:
+    build: .
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app
+    environment:
+      STREAMLIT_SERVER_ENABLE_STATIC_SERVING: "true"
