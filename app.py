@@ -7,7 +7,7 @@ import pandas as pd
 import streamlit as st
 
 from strategy.backtest import run_backtest
-from strategy.data_loader import AUTO_PORTFOLIO, LATEST_SIGNAL, live_data_exists, load_live_data, load_sample_data, normalize_uploaded_csv
+from strategy.data_loader import AUTO_PORTFOLIO, LATEST_SIGNAL, live_data_exists, load_live_data, load_sample_data
 from strategy.indicators import add_indicators
 from strategy.state_machine import evaluate_strategy
 from ui.components import explain_list, hero, price_chart, r_chart, score_gauge, signal_cards, top_metrics
@@ -17,6 +17,8 @@ from ui.theme import inject_css, inject_pwa_tags, set_page
 set_page()
 inject_css()
 inject_pwa_tags()
+
+CAPITAL = 100_000.0
 
 
 def _read_json(path: Path) -> dict:
@@ -37,47 +39,23 @@ def _auto_position_inputs(df: pd.DataFrame, capital: float) -> tuple[float, floa
     return position_ratio, average_cost, portfolio
 
 
-st.sidebar.markdown("### 数据输入")
-available_sources = ["自动更新数据", "示例数据", "上传CSV"] if live_data_exists() else ["示例数据", "上传CSV"]
-source = st.sidebar.radio("数据源", available_sources, index=0)
-capital = st.sidebar.number_input("本金", min_value=10_000, max_value=10_000_000, value=100_000, step=10_000)
-
-if source == "上传CSV":
-    uploaded = st.sidebar.file_uploader("上传行情CSV", type=["csv"])
-    if uploaded is not None:
-        raw_df = pd.read_csv(uploaded)
-        df = normalize_uploaded_csv(raw_df)
-    else:
-        st.info("请上传CSV。未上传时展示示例数据。")
-        df = load_sample_data()
-elif source == "自动更新数据":
+if live_data_exists():
     df = load_live_data()
+    data_mode = "自动更新数据"
 else:
     df = load_sample_data()
+    data_mode = "示例数据"
 
 enriched = add_indicators(df)
 latest_signal = _read_json(LATEST_SIGNAL)
-
-if source == "自动更新数据":
-    current_position, average_cost, portfolio = _auto_position_inputs(enriched, float(capital))
-    st.sidebar.success("正在使用GitHub Actions自动更新数据。")
-    st.sidebar.caption(f"最新数据日期：{pd.to_datetime(enriched.iloc[-1]['date']).date()}")
-    if latest_signal.get("auto_update", {}).get("updated_at"):
-        st.sidebar.caption(f"最近自动更新：{latest_signal['auto_update']['updated_at']}")
-else:
-    current_position = st.sidebar.select_slider("当前仓位", options=[0.0, 0.2, 0.4, 0.7, 1.0], value=0.0, format_func=lambda x: f"{int(x*100)}%")
-    average_cost_input = st.sidebar.number_input("持仓均价（无持仓可填0）", min_value=0.0, value=0.0, step=0.001, format="%.3f")
-    average_cost = average_cost_input or None
-    portfolio = {}
-
-cooldown_days = st.sidebar.number_input("冷却期剩余交易日", min_value=0, max_value=20, value=0, step=1)
+current_position, average_cost, portfolio = _auto_position_inputs(enriched, CAPITAL) if data_mode == "自动更新数据" else (0.0, None, {})
 
 result = evaluate_strategy(
     enriched,
     current_position=current_position,
     average_cost=average_cost,
-    capital=capital,
-    cooldown_days_left=int(cooldown_days),
+    capital=CAPITAL,
+    cooldown_days_left=0,
 )
 
 hero(result)
@@ -86,13 +64,13 @@ top_metrics(result)
 st.write("")
 signal_cards(result)
 
-if source == "自动更新数据" and latest_signal:
+if data_mode == "自动更新数据" and latest_signal:
     auto = latest_signal.get("auto_update", {})
     pending = auto.get("next_execution")
     executed = auto.get("executed_trade_from_previous_signal")
     st.markdown("### 自动更新状态")
     c1, c2, c3 = st.columns(3)
-    c1.info(f"信号日期：{auto.get('signal_date', latest_signal.get('date', 'N/A'))}")
+    c1.info(f"信号日期：{auto.get('signal_date', latest_signal.get('date', result.date))}")
     c2.info(f"数据源：{auto.get('source', 'N/A')}")
     c3.info(f"下一步：{pending.get('side', 'HOLD') if pending else 'HOLD'}")
     if pending:
@@ -119,7 +97,7 @@ with signal_tab:
     st.json(result.hard_flags)
     st.markdown("### 四信号得分")
     st.dataframe(pd.DataFrame([c.__dict__ for c in result.cards]), use_container_width=True, hide_index=True)
-    if source == "自动更新数据":
+    if data_mode == "自动更新数据":
         st.markdown("### 自动组合状态")
         st.json(portfolio)
         st.markdown("### 最新信号JSON")
@@ -128,9 +106,9 @@ with signal_tab:
 with backtest_tab:
     st.markdown("### 策略回测")
     st.caption("回测严格使用T日收盘后信号、T+1开盘执行。买入有高开降额/暂缓规则，卖出不设低开保护。")
-    bt = run_backtest(enriched, initial_capital=float(capital))
+    bt = run_backtest(enriched, initial_capital=CAPITAL)
     m1, m2, m3, m4 = st.columns(4)
-    m1.metric("最终权益", f"¥{bt.metrics.get('final_equity', capital):,.0f}")
+    m1.metric("最终权益", f"¥{bt.metrics.get('final_equity', CAPITAL):,.0f}")
     m2.metric("累计收益", f"{bt.metrics.get('total_return', 0)*100:.2f}%")
     m3.metric("最大回撤", f"{bt.metrics.get('max_drawdown', 0)*100:.2f}%")
     m4.metric("交易次数", f"{bt.metrics.get('trade_count', 0)}")
