@@ -24,14 +24,16 @@ LATEST_SIGNAL = DATA_DIR / "latest_signal.json"
 PORTFOLIO_STATE = DATA_DIR / "auto_portfolio.json"
 SIGNAL_HISTORY = DATA_DIR / "signal_history.csv"
 UPDATE_LOG = DATA_DIR / "update_log.json"
-REAL_HISTORY_LOOKBACK_DAYS = 820
+DAILY_INCREMENTAL_LOOKBACK_DAYS = 15
+HISTORY_BOOTSTRAP_LOOKBACK_DAYS = 820
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Update 512890 daily data and signal snapshot after market close.")
     parser.add_argument("--offline-sample", action="store_true", help="Use bundled sample data only for local tests, never for production Actions.")
+    parser.add_argument("--bootstrap-history", action="store_true", help="Rebuild the stored real market history with a long lookback window.")
     parser.add_argument("--capital", type=float, default=100_000.0)
-    parser.add_argument("--lookback-days", type=int, default=REAL_HISTORY_LOOKBACK_DAYS)
+    parser.add_argument("--lookback-days", type=int, default=None)
     parser.add_argument("--end-date", type=str, default=None, help="YYYY-MM-DD, mostly for reproducible tests.")
     return parser.parse_args()
 
@@ -40,17 +42,19 @@ def main() -> None:
     args = parse_args()
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     end_date = datetime.strptime(args.end_date, "%Y-%m-%d").date() if args.end_date else date.today()
+    lookback_days = _resolve_lookback_days(args)
+    update_mode = _resolve_update_mode(args)
 
     if args.offline_sample:
         incoming = load_sample_data()
         source = "offline_sample"
         amount_basis = "sample"
     else:
-        incoming = fetch_daily_market_data(end_date=end_date, config=FetchConfig(lookback_days=args.lookback_days))
+        incoming = fetch_daily_market_data(end_date=end_date, config=FetchConfig(lookback_days=lookback_days))
         source = incoming.attrs.get("source") or "real_market_multi_source"
         amount_basis = incoming.attrs.get("amount_basis") or "reported_or_estimated_amount"
 
-    merged = _merge_existing(LIVE_DATA, incoming, source=source)
+    merged = _merge_existing(LIVE_DATA, incoming, source=source, replace_existing=args.bootstrap_history)
     merged.to_csv(LIVE_DATA, index=False, encoding="utf-8-sig")
 
     enriched = add_indicators(merged)
@@ -75,6 +79,7 @@ def main() -> None:
     extra = {
         "source": source,
         "amount_basis": amount_basis,
+        "update_mode": update_mode,
         "updated_at": portfolio.last_update,
         "signal_date": signal_date,
         "next_execution": pending,
@@ -91,25 +96,45 @@ def main() -> None:
             "last_update": portfolio.last_update,
             "source": source,
             "amount_basis": amount_basis,
+            "update_mode": update_mode,
             "rows": int(len(merged)),
             "latest_date": signal_date,
-            "lookback_days": int(args.lookback_days),
-            "data_policy": "production Actions must use real public market data; offline sample is local-test only.",
+            "lookback_days": int(lookback_days),
+            "data_policy": "bootstrap-history rebuilds the real historical archive once; daily Actions use short-window real-data incremental updates only. Offline sample is local-test only.",
         },
     )
 
-    print(f"Updated {LIVE_DATA} rows={len(merged)} latest={signal_date} source={source} amount_basis={amount_basis}")
+    print(
+        f"Updated {LIVE_DATA} rows={len(merged)} latest={signal_date} "
+        f"source={source} amount_basis={amount_basis} mode={update_mode} lookback_days={lookback_days}"
+    )
     print(f"Signal: {result.target_state.value} action={result.action} amount={result.action_amount:.2f}")
 
 
-def _merge_existing(path: Path, incoming: pd.DataFrame, source: str) -> pd.DataFrame:
+def _resolve_lookback_days(args: argparse.Namespace) -> int:
+    if args.lookback_days is not None:
+        return int(args.lookback_days)
+    if args.bootstrap_history:
+        return HISTORY_BOOTSTRAP_LOOKBACK_DAYS
+    return DAILY_INCREMENTAL_LOOKBACK_DAYS
+
+
+def _resolve_update_mode(args: argparse.Namespace) -> str:
+    if args.offline_sample:
+        return "offline_sample"
+    if args.bootstrap_history:
+        return "bootstrap_history"
+    return "daily_incremental"
+
+
+def _merge_existing(path: Path, incoming: pd.DataFrame, source: str, replace_existing: bool = False) -> pd.DataFrame:
     incoming = validate_price_frame(incoming)
     if path.exists():
         existing = load_csv(path)
         if source != "offline_sample":
             existing_dates = set(pd.to_datetime(existing["date"]).dt.date)
             incoming_dates = set(pd.to_datetime(incoming["date"]).dt.date)
-            if existing_dates and existing_dates.issubset(incoming_dates):
+            if replace_existing or _existing_archive_is_offline_sample() or (existing_dates and existing_dates.issubset(incoming_dates)):
                 merged = incoming
             else:
                 merged = pd.concat([existing, incoming], ignore_index=True)
@@ -119,6 +144,16 @@ def _merge_existing(path: Path, incoming: pd.DataFrame, source: str) -> pd.DataF
         merged = incoming
     merged = merged.drop_duplicates(subset=["date"], keep="last").sort_values("date").reset_index(drop=True)
     return merged
+
+
+def _existing_archive_is_offline_sample() -> bool:
+    if not UPDATE_LOG.exists():
+        return False
+    try:
+        info = read_json(UPDATE_LOG, default={})
+    except Exception:
+        return False
+    return info.get("source") == "offline_sample" or info.get("update_mode") == "offline_sample"
 
 
 def _append_signal_history(result, extra: dict) -> None:
