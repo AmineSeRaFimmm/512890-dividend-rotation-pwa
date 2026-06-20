@@ -19,6 +19,12 @@ inject_css()
 inject_pwa_tags()
 
 CAPITAL = 100_000.0
+BACKTEST_PERIODS = {
+    "两年": pd.DateOffset(years=2),
+    "一年": pd.DateOffset(years=1),
+    "六个月": pd.DateOffset(months=6),
+    "三个月": pd.DateOffset(months=3),
+}
 
 
 def _read_json(path: Path) -> dict:
@@ -37,6 +43,13 @@ def _auto_position_inputs(df: pd.DataFrame, capital: float) -> tuple[float, floa
     position_ratio = (shares * latest_close) / float(portfolio.get("capital", capital) or capital)
     average_cost = portfolio.get("average_cost")
     return position_ratio, average_cost, portfolio
+
+
+def _backtest_start_date(df: pd.DataFrame, period_label: str) -> pd.Timestamp:
+    latest_date = pd.to_datetime(df["date"]).max()
+    earliest_date = pd.to_datetime(df["date"]).min()
+    offset = BACKTEST_PERIODS[period_label]
+    return max(earliest_date, latest_date - offset)
 
 
 if live_data_exists():
@@ -83,7 +96,11 @@ with signal_tab:
 with backtest_tab:
     st.markdown("### 策略回测")
     st.caption("回测严格使用T日收盘后信号、T+1开盘执行。买入有高开降额/暂缓规则，卖出不设低开保护。")
-    bt = run_backtest(enriched, initial_capital=CAPITAL)
+    period_label = st.radio("回测区间", list(BACKTEST_PERIODS.keys()), index=0, horizontal=True)
+    start_date = _backtest_start_date(enriched, period_label)
+    end_date = pd.to_datetime(enriched["date"]).max()
+    st.caption(f"当前区间：{start_date.date()} 至 {end_date.date()}。区间内以初始资金重新独立回测，区间前数据仅用于均线和信号预热。")
+    bt = run_backtest(enriched, initial_capital=CAPITAL, start_date=start_date, end_date=end_date)
     m1, m2, m3, m4 = st.columns(4)
     m1.metric("最终权益", f"¥{bt.metrics.get('final_equity', CAPITAL):,.0f}")
     m2.metric("累计收益", f"{bt.metrics.get('total_return', 0)*100:.2f}%")
@@ -95,6 +112,8 @@ with backtest_tab:
         fig = go.Figure(go.Scatter(x=bt.equity_curve["date"], y=bt.equity_curve["equity"], mode="lines", name="权益曲线"))
         fig.update_layout(height=360, margin=dict(l=20, r=20, t=30, b=20), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(255,255,255,0.4)")
         st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.info("当前区间可用于回测的数据不足。请先完成两年真实历史数据建库，或选择更长区间。")
     st.markdown("#### 交易记录")
     st.dataframe(bt.trades, use_container_width=True, hide_index=True)
 
