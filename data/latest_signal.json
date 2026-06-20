@@ -4,7 +4,7 @@
   "target_state": "S0 空仓等待",
   "current_position": 0.0,
   "target_position": 0.0,
-  "total_score": 5,
+  "total_score": 2,
   "action": "HOLD",
   "action_amount": 0.0,
   "action_shares_estimate": null,
@@ -19,9 +19,9 @@
     {
       "name": "512890趋势",
       "value": 1.128,
-      "score": 1,
-      "status": "趋势中性",
-      "detail": "512890价格结构未形成明确多头排列。"
+      "score": 0,
+      "status": "红利弱势",
+      "detail": "512890收盘1.128低于MA5=1.138。"
     },
     {
       "name": "512890承接 CLV",
@@ -33,14 +33,12 @@
     {
       "name": "科技拥挤/钝化",
       "value": 0.457,
-      "score": 3,
-      "status": "科技转弱",
-      "detail": "588000跌破MA5且R均线下行，有利于红利切换。"
+      "score": 1,
+      "status": "科技放缓",
+      "detail": "588000仍在MA5上方，但日内强度下降。"
     }
   ],
-  "reasons": [
-    "S0→S1：需要R<1.70、CLV≥0.60、未创5日新低、成交额不低于5日均额80%。"
-  ],
+  "reasons": [],
   "warnings": [],
   "hard_flags": {
     "strong_rotation": false,
@@ -51,23 +49,23 @@
   },
   "raw": {
     "r_tech_dividend": 1.9955673758865249,
-    "r_ma3": 2.0083757808425045,
-    "r_ma3_falling": true,
+    "r_ma3": 1.8351377262448176,
+    "r_ma3_falling": false,
     "close_512890": 1.128,
-    "ma5_512890": 1.1224,
-    "ma10_512890": 1.1269,
-    "ma20_512890": 1.1222,
+    "ma5_512890": 1.1378,
+    "ma10_512890": 1.1523999999999999,
+    "ma20_512890": 1.1572999999999998,
     "clv_512890": 0.5999999999999971,
     "close_588000": 2.251,
-    "ma5_588000": 2.2618,
+    "ma5_588000": 1.9811999999999999,
     "clv_588000": 0.4571428571428557,
     "market_up_ratio": 0.6781481481481482
   },
   "current_position_pct": 0,
   "target_position_pct": 0,
   "auto_update": {
-    "source": "offline_sample",
-    "updated_at": "2026-06-20T10:28:23",
+    "source": "akshare_eastmoney_etf",
+    "updated_at": "2026-06-20T12:35:46",
     "signal_date": "2026-06-19",
     "next_execution": null,
     "executed_trade_from_previous_signal": null,
@@ -79,7 +77,7 @@
       "position_value": 0.0,
       "current_position_ratio": 0.0,
       "pending_order": null,
-      "last_update": "2026-06-20T10:28:23",
+      "last_update": "2026-06-20T12:35:46",
       "trade_log": []
     },
     "note": "GitHub Actions每天18:00后生成收盘信号；如有买卖信号，由用户在下一交易日开盘手动执行。自动组合仅用于PWA展示和回测跟踪。"
