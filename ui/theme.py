@@ -59,6 +59,15 @@ def inject_css() -> None:
         .metric-label { color: var(--ios-muted); font-size: 13px; font-weight: 560; }
         .metric-value { color: var(--ios-text); font-size: 30px; font-weight: 760; letter-spacing: -0.035em; margin-top: 8px; }
         .metric-note { color: var(--ios-muted); font-size: 12px; margin-top: 10px; line-height: 1.45; }
+        .position-flow-single { display: flex; align-items: center; justify-content: flex-end; margin-top: 10px; min-height: 34px; }
+        .position-flow { display: flex; align-items: center; justify-content: flex-start; gap: 10px; margin-top: 10px; min-height: 34px; flex-wrap: wrap; }
+        .state-button {
+            display: inline-flex; align-items: center; justify-content: center; padding: 8px 13px; border-radius: 999px;
+            font-size: 13px; font-weight: 680; border: 1px solid rgba(31,41,55,0.08); white-space: nowrap;
+        }
+        .state-button-from { background: rgba(107,114,128,0.10); color: #4B5563; }
+        .state-button-to { background: rgba(122,156,198,0.16); color: #405D7C; border-color: rgba(122,156,198,0.22); }
+        .state-arrow { color: #7A9CC6; font-size: 20px; font-weight: 720; line-height: 1; }
         .signal-card {
             border-radius: 22px; border: 1px solid var(--ios-stroke); padding: 18px 18px; background: rgba(255,255,255,0.72);
             min-height: 170px;
