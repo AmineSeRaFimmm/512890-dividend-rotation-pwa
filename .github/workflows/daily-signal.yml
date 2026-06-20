@@ -1,18 +1,21 @@
 name: Update Daily 512890 Signal
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/daily-signal.yml"
+      - "scripts/update_daily_snapshot.py"
+      - "strategy/market_fetcher.py"
+      - "requirements.txt"
   schedule:
     # 18:15 Asia/Shanghai, after A-share market data should be settled.
     - cron: "15 10 * * 1-5"
   workflow_dispatch:
     inputs:
-      offline_sample:
-        description: "Use bundled sample data instead of live market fetch"
-        required: false
-        type: boolean
-        default: false
       end_date:
-        description: "Optional YYYY-MM-DD end date for reproducible manual runs"
+        description: "Optional YYYY-MM-DD end date for reproducible manual live runs"
         required: false
         type: string
 
@@ -26,7 +29,7 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,12 +47,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Update daily signal snapshot
+      - name: Update daily signal snapshot from real market data
         run: |
-          ARGS=""
-          if [ "${{ inputs.offline_sample }}" = "true" ]; then
-            ARGS="$ARGS --offline-sample"
-          fi
+          ARGS="--lookback-days 820"
           if [ -n "${{ inputs.end_date }}" ]; then
             ARGS="$ARGS --end-date ${{ inputs.end_date }}"
           fi
@@ -66,6 +66,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No data changes to commit."
           else
-            git commit -m "chore: update daily 512890 signal snapshot"
+            git commit -m "chore: update real 512890 market history"
             git push
           fi
