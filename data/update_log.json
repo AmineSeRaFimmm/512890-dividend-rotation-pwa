@@ -1,8 +1,9 @@
 {
-  "last_update": "2026-06-20T12:35:46",
-  "source": "akshare_eastmoney_etf",
+  "last_update": "2026-06-20T13:03:37",
+  "source": "512890:sina_direct;588000:sina_direct",
+  "amount_basis": "512890:reported_or_close_times_volume;588000:reported_or_close_times_volume",
   "rows": 546,
   "latest_date": "2026-06-19",
   "lookback_days": 820,
-  "data_policy": "production Actions must use real AKShare/Eastmoney ETF daily bars; offline sample is local-test only."
+  "data_policy": "production Actions must use real public market data; offline sample is local-test only."
 }
