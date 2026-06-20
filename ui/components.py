@@ -9,13 +9,15 @@ import streamlit as st
 from strategy.models import SignalResult
 
 
+APP_NAME = "静澜红利"
+
+
 def hero(result: SignalResult) -> None:
     st.markdown(
         f"""
         <div class="hero-card">
-          <div class="status-pill">{result.target_state.value}</div>
-          <div class="hero-title">512890 红利低波信号系统</div>
-          <div class="hero-subtitle">T日收盘后计算信号，下一交易日开盘执行。当前目标仓位 <b>{result.target_position_pct}%</b>，动作：<b>{action_cn(result.action)}</b>。</div>
+          <div class="hero-title">{APP_NAME}</div>
+          <div class="hero-subtitle">信号日期：{result.date}</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -31,16 +33,31 @@ def action_cn(action: str) -> str:
 
 
 def top_metrics(result: SignalResult) -> None:
-    c1, c2, c3, c4 = st.columns(4)
-    metrics = [
-        ("总分", f"{result.total_score}/12", "四类信号综合评分"),
-        ("目标仓位", f"{result.target_position_pct}%", "只允许512890+现金"),
-        ("执行金额", f"¥{result.action_amount:,.0f}", "按10万元本金换算"),
-        ("预估份额", f"{result.action_shares_estimate or 0:,}", "按信号日收盘价估算"),
-    ]
-    for col, (label, value, note) in zip([c1, c2, c3, c4], metrics):
-        with col:
-            st.markdown(f"<div class='metric-card'><div class='metric-label'>{label}</div><div class='metric-value'>{value}</div><div class='metric-note'>{note}</div></div>", unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+    with c1:
+        st.markdown(
+            f"""
+            <div class='metric-card'>
+              <div class='metric-head'>
+                <div class='metric-label'>总分</div>
+                <div class='status-pill'>{result.target_state.value}</div>
+              </div>
+              <div class='metric-value'>{result.total_score}/12</div>
+              <div class='metric-note'>四类信号综合评分</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with c2:
+        st.markdown(
+            f"""
+            <div class='metric-card'>
+              <div class='metric-label'>目标仓位</div>
+              <div class='metric-value'>{result.target_position_pct}%</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
 
 def signal_cards(result: SignalResult) -> None:
