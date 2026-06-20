@@ -142,21 +142,28 @@ def _buy_and_hold_512890(data: pd.DataFrame, initial_capital: float, start_ts: p
 
 
 def _s0_gate_diagnostic_row(signal_date: str, row: pd.Series, total_score: int) -> dict:
+    close = float(row["close_512890"])
+    ma5 = float(row["ma5_512890"])
+    clv = float(row["clv_512890"])
+    amount_ma5 = float(row["amount_ma5_512890"])
+    amount_ratio = float(row["amount_512890"] / amount_ma5) if amount_ma5 else float("nan")
+    external_extreme = bool(row["r_tech_dividend"] > 1.90 and row["close_588000"] > row["ma5_588000"] and row["clv_588000"] > 0.70)
+    own_turning = (close > ma5 or clv >= 0.60) and clv >= 0.45
     checks = {
-        "总分>=4": total_score >= 4,
-        "R<1.70": float(row["r_tech_dividend"]) < 1.70,
-        "CLV>=0.60": float(row["clv_512890"]) >= 0.60,
+        "总分>=3": total_score >= 3,
+        "512890站上MA5或CLV>=0.60": own_turning,
         "未创5日新低": not bool(row["new_5d_low_512890"]),
-        "成交额>=5日均额80%": float(row["amount_512890"]) >= float(row["amount_ma5_512890"]) * 0.8,
+        "成交额>=5日均额60%": amount_ratio >= 0.60,
+        "非极端科技吸血压制": not (external_extreme and close < ma5),
     }
     failed = [name for name, ok in checks.items() if not ok]
     return {
         "date": signal_date,
         "total_score": int(total_score),
         "r_tech_dividend": float(row["r_tech_dividend"]),
-        "clv_512890": float(row["clv_512890"]),
+        "clv_512890": clv,
         "new_5d_low_512890": bool(row["new_5d_low_512890"]),
-        "amount_ratio_to_ma5": float(row["amount_512890"] / row["amount_ma5_512890"]) if float(row["amount_ma5_512890"]) else float("nan"),
+        "amount_ratio_to_ma5": amount_ratio,
         "passed_all": len(failed) == 0,
         "failed_count": len(failed),
         "failed_conditions": "、".join(failed),
