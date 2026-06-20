@@ -52,6 +52,14 @@ def _backtest_start_date(df: pd.DataFrame, period_label: str) -> pd.Timestamp:
     return max(earliest_date, latest_date - offset)
 
 
+@st.cache_data(show_spinner=False)
+def _cached_simple_backtest(csv_payload: str, start_date: str, end_date: str, capital: float):
+    from io import StringIO
+
+    cached_df = pd.read_csv(StringIO(csv_payload))
+    return run_backtest(cached_df, initial_capital=capital, start_date=start_date, end_date=end_date)
+
+
 if live_data_exists():
     df = load_live_data()
     data_mode = "自动更新数据"
@@ -99,23 +107,27 @@ with backtest_tab:
     period_label = st.radio("回测区间", list(BACKTEST_PERIODS.keys()), index=0, horizontal=True)
     start_date = _backtest_start_date(enriched, period_label)
     end_date = pd.to_datetime(enriched["date"]).max()
-    st.caption(f"当前区间：{start_date.date()} 至 {end_date.date()}。区间内以初始资金重新独立回测，区间前数据仅用于均线和信号预热。")
-    bt = run_backtest(enriched, initial_capital=CAPITAL, start_date=start_date, end_date=end_date)
-    m1, m2, m3, m4 = st.columns(4)
-    m1.metric("最终权益", f"¥{bt.metrics.get('final_equity', CAPITAL):,.0f}")
-    m2.metric("累计收益", f"{bt.metrics.get('total_return', 0)*100:.2f}%")
-    m3.metric("最大回撤", f"{bt.metrics.get('max_drawdown', 0)*100:.2f}%")
-    m4.metric("交易次数", f"{bt.metrics.get('trade_count', 0)}")
-    if not bt.equity_curve.empty:
-        import plotly.graph_objects as go
-
-        fig = go.Figure(go.Scatter(x=bt.equity_curve["date"], y=bt.equity_curve["equity"], mode="lines", name="权益曲线"))
-        fig.update_layout(height=360, margin=dict(l=20, r=20, t=30, b=20), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(255,255,255,0.4)")
-        st.plotly_chart(fig, use_container_width=True)
+    st.caption(f"当前区间：{start_date.date()} 至 {end_date.date()}。区间前数据仅用于均线和信号预热。")
+    if not st.button("运行回测", type="primary", use_container_width=True):
+        st.info("为保证PWA首页快速打开，回测不会自动运行。选择区间后点击运行回测。")
     else:
-        st.info("当前区间可用于回测的数据不足。请先完成两年真实历史数据建库，或选择更长区间。")
-    st.markdown("#### 交易记录")
-    st.dataframe(bt.trades, use_container_width=True, hide_index=True)
+        with st.spinner("正在运行回测……"):
+            bt = _cached_simple_backtest(enriched.to_csv(index=False), str(start_date.date()), str(end_date.date()), CAPITAL)
+        m1, m2, m3, m4 = st.columns(4)
+        m1.metric("最终权益", f"¥{bt.metrics.get('final_equity', CAPITAL):,.0f}")
+        m2.metric("累计收益", f"{bt.metrics.get('total_return', 0)*100:.2f}%")
+        m3.metric("最大回撤", f"{bt.metrics.get('max_drawdown', 0)*100:.2f}%")
+        m4.metric("交易次数", f"{bt.metrics.get('trade_count', 0)}")
+        if not bt.equity_curve.empty:
+            import plotly.graph_objects as go
+
+            fig = go.Figure(go.Scatter(x=bt.equity_curve["date"], y=bt.equity_curve["equity"], mode="lines", name="权益曲线"))
+            fig.update_layout(height=360, margin=dict(l=20, r=20, t=30, b=20), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(255,255,255,0.4)")
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("当前区间可用于回测的数据不足。请先完成两年真实历史数据建库，或选择更长区间。")
+        st.markdown("#### 交易记录")
+        st.dataframe(bt.trades, use_container_width=True, hide_index=True)
 
 with data_tab:
     st.markdown("### 行情数据")
