@@ -44,9 +44,11 @@ def main() -> None:
     if args.offline_sample:
         incoming = load_sample_data()
         source = "offline_sample"
+        amount_basis = "sample"
     else:
         incoming = fetch_daily_market_data(end_date=end_date, config=FetchConfig(lookback_days=args.lookback_days))
-        source = "akshare_eastmoney_etf"
+        source = incoming.attrs.get("source") or "real_market_multi_source"
+        amount_basis = incoming.attrs.get("amount_basis") or "reported_or_estimated_amount"
 
     merged = _merge_existing(LIVE_DATA, incoming, source=source)
     merged.to_csv(LIVE_DATA, index=False, encoding="utf-8-sig")
@@ -72,6 +74,7 @@ def main() -> None:
 
     extra = {
         "source": source,
+        "amount_basis": amount_basis,
         "updated_at": portfolio.last_update,
         "signal_date": signal_date,
         "next_execution": pending,
@@ -87,14 +90,15 @@ def main() -> None:
         {
             "last_update": portfolio.last_update,
             "source": source,
+            "amount_basis": amount_basis,
             "rows": int(len(merged)),
             "latest_date": signal_date,
             "lookback_days": int(args.lookback_days),
-            "data_policy": "production Actions must use real AKShare/Eastmoney ETF daily bars; offline sample is local-test only.",
+            "data_policy": "production Actions must use real public market data; offline sample is local-test only.",
         },
     )
 
-    print(f"Updated {LIVE_DATA} rows={len(merged)} latest={signal_date} source={source}")
+    print(f"Updated {LIVE_DATA} rows={len(merged)} latest={signal_date} source={source} amount_basis={amount_basis}")
     print(f"Signal: {result.target_state.value} action={result.action} amount={result.action_amount:.2f}")
 
 
@@ -102,7 +106,7 @@ def _merge_existing(path: Path, incoming: pd.DataFrame, source: str) -> pd.DataF
     incoming = validate_price_frame(incoming)
     if path.exists():
         existing = load_csv(path)
-        if source == "akshare_eastmoney_etf":
+        if source != "offline_sample":
             existing_dates = set(pd.to_datetime(existing["date"]).dt.date)
             incoming_dates = set(pd.to_datetime(incoming["date"]).dt.date)
             if existing_dates and existing_dates.issubset(incoming_dates):
