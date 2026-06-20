@@ -18,8 +18,16 @@ class BacktestResult:
     metrics: dict
 
 
-def run_backtest(df: pd.DataFrame, initial_capital: float = 100_000) -> BacktestResult:
+def run_backtest(
+    df: pd.DataFrame,
+    initial_capital: float = 100_000,
+    start_date: str | pd.Timestamp | None = None,
+    end_date: str | pd.Timestamp | None = None,
+) -> BacktestResult:
     data = add_indicators(df)
+    start_ts = pd.to_datetime(start_date) if start_date is not None else None
+    end_ts = pd.to_datetime(end_date) if end_date is not None else None
+
     cash = initial_capital
     shares = 0
     avg_cost = None
@@ -27,6 +35,13 @@ def run_backtest(df: pd.DataFrame, initial_capital: float = 100_000) -> Backtest
     equity: List[dict] = []
 
     for i in range(20, len(data) - 1):
+        signal_date = pd.to_datetime(data.iloc[i]["date"])
+        trade_date = pd.to_datetime(data.iloc[i + 1]["date"])
+        if start_ts is not None and signal_date < start_ts:
+            continue
+        if end_ts is not None and trade_date > end_ts:
+            continue
+
         history = data.iloc[: i + 1].copy()
         close = float(data.iloc[i]["close_512890"])
         position_value = shares * close
@@ -44,7 +59,7 @@ def run_backtest(df: pd.DataFrame, initial_capital: float = 100_000) -> Backtest
                 shares += buy_shares
                 cash -= cost
                 avg_cost = (previous_cost + cost) / shares
-                trades.append({"signal_date": result.date, "trade_date": str(data.iloc[i+1]["date"].date()), "side": "BUY", "price": next_open, "shares": buy_shares, "amount": cost, "state": result.target_state.value})
+                trades.append({"signal_date": result.date, "trade_date": str(trade_date.date()), "side": "BUY", "price": next_open, "shares": buy_shares, "amount": cost, "state": result.target_state.value})
         elif result.action == "SELL_512890":
             plan = t_plus_1_sell_execution(result.action_amount, next_open)
             sell_shares = min(shares, estimate_shares(plan.executable_amount, next_open))
@@ -54,11 +69,11 @@ def run_backtest(df: pd.DataFrame, initial_capital: float = 100_000) -> Backtest
                 cash += proceeds
                 if shares == 0:
                     avg_cost = None
-                trades.append({"signal_date": result.date, "trade_date": str(data.iloc[i+1]["date"].date()), "side": "SELL", "price": next_open, "shares": sell_shares, "amount": proceeds, "state": result.target_state.value})
+                trades.append({"signal_date": result.date, "trade_date": str(trade_date.date()), "side": "SELL", "price": next_open, "shares": sell_shares, "amount": proceeds, "state": result.target_state.value})
 
         mark_price = float(data.iloc[i + 1]["close_512890"])
         total_equity = cash + shares * mark_price
-        equity.append({"date": str(data.iloc[i+1]["date"].date()), "cash": cash, "shares": shares, "close": mark_price, "equity": total_equity, "return": total_equity / initial_capital - 1})
+        equity.append({"date": str(trade_date.date()), "cash": cash, "shares": shares, "close": mark_price, "equity": total_equity, "return": total_equity / initial_capital - 1})
 
     trades_df = pd.DataFrame(trades)
     equity_df = pd.DataFrame(equity)
@@ -68,7 +83,7 @@ def run_backtest(df: pd.DataFrame, initial_capital: float = 100_000) -> Backtest
 
 def _metrics(equity: pd.DataFrame, trades: pd.DataFrame, initial_capital: float) -> dict:
     if equity.empty:
-        return {"total_return": 0, "max_drawdown": 0, "trade_count": 0}
+        return {"total_return": 0, "max_drawdown": 0, "trade_count": 0, "final_equity": initial_capital}
     returns = equity["equity"] / initial_capital - 1
     peak = equity["equity"].cummax()
     drawdown = equity["equity"] / peak - 1
