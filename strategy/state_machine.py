@@ -23,15 +23,13 @@ def state_from_position(position_ratio: float) -> StrategyState:
 
 
 def base_state_from_score(total_score: int) -> StrategyState:
-    # 单资产512890择时：总分只决定候选仓位，最终仍由买入门槛逐级确认。
-    # 阈值采用稳定分层，不做历史样本参数搜索。
-    if total_score <= 2:
+    if total_score <= 3:
         return StrategyState.S0
-    if total_score <= 4:
+    if total_score <= 5:
         return StrategyState.S1
-    if total_score <= 6:
+    if total_score <= 7:
         return StrategyState.S2
-    if total_score <= 8:
+    if total_score <= 9:
         return StrategyState.S3
     return StrategyState.S4
 
@@ -144,37 +142,34 @@ def _apply_transition_rules(
 
 
 def _buy_gate(current_state: StrategyState, next_state: StrategyState, row: pd.Series, total_score: int, reasons: List[str]) -> bool:
+    r = row["r_tech_dividend"]
     close = row["close_512890"]
     ma5 = row["ma5_512890"]
     ma10 = row["ma10_512890"]
     ma20 = row["ma20_512890"]
     clv = row["clv_512890"]
+    k_clv = row["clv_588000"]
+    tech_close = row["close_588000"]
+    tech_ma5 = row["ma5_588000"]
     amount = row["amount_512890"]
     amount_ma5 = row["amount_ma5_512890"]
-    strong_streak = int(row["strong_clv_streak_512890"])
-    liquidity_ok = amount >= amount_ma5 * 0.60
-    external_caution = _external_caution(row)
-    external_extreme = _external_extreme(row)
 
     if next_state == StrategyState.S1:
-        own_turning = (close > ma5 or clv >= 0.60) and clv >= 0.45
-        ok = total_score >= 3 and own_turning and not bool(row["new_5d_low_512890"]) and liquidity_ok and not (external_extreme and close < ma5)
-        reasons.append("S0→S1：以512890自身转强为主，需总分≥3、站上MA5或CLV≥0.60、CLV不低于0.45、未创5日新低、成交额不低于5日均额60%；极端科技吸血且512890未站上MA5时暂缓。")
+        ok = total_score >= 4 and r < 1.70 and clv >= 0.60 and not bool(row["new_5d_low_512890"]) and amount >= amount_ma5 * 0.8
+        reasons.append("S0→S1：需要R<1.70、CLV≥0.60、未创5日新低、成交额不低于5日均额80%。")
         return ok
     if next_state == StrategyState.S2:
-        ok = total_score >= 5 and close > ma5 and (strong_streak >= 1 or clv >= 0.55) and liquidity_ok and not (external_extreme and clv < 0.70)
-        reasons.append("S1→S2：512890站上MA5且出现承接，成交额不低于5日均额60%；极端科技吸血时要求更强CLV。")
+        ok = total_score >= 6 and r < 1.64 and close > ma5 and (int(row["strong_clv_streak_512890"]) >= 2 or clv >= 0.70) and (k_clv < 0.50 or tech_close < tech_ma5)
+        reasons.append("S1→S2：需要R<1.64、512890站上MA5、承接增强、科技钝化或跌破MA5。")
         return ok
     if next_state == StrategyState.S3:
-        own_trend_confirmed = close > ma10 and (ma5 >= ma10 or close > ma20)
-        own_support_confirmed = strong_streak >= 2 or clv >= 0.65
-        ok = total_score >= 7 and own_trend_confirmed and own_support_confirmed and not external_extreme
-        reasons.append("S2→S3：512890站上MA10，MA5不弱于MA10或站上MA20，并且承接连续或CLV≥0.65；极端科技吸血时不升主仓。")
+        ok = total_score >= 8 and r < 1.64 and bool(row["r_ma3_falling"]) and close > ma10 and int(row["strong_clv_streak_512890"]) >= 3 and (tech_close < tech_ma5 or k_clv < 0.40)
+        reasons.append("S2→S3：需要R<1.64且3日均线下行、512890站上MA10、连续3日强承接、科技转弱。")
         return ok
     if next_state == StrategyState.S4:
         market_ok = True if pd.isna(row.get("market_up_ratio")) else row.get("market_up_ratio") >= 0.45
-        ok = total_score >= 9 and close > ma20 and ma5 > ma10 and (strong_streak >= 3 or clv >= 0.70) and market_ok and not external_caution
-        reasons.append("S3→S4：512890站上MA20、MA5>MA10、强承接确认且市场宽度不差；科技明显吸血时不升满仓。")
+        ok = total_score >= 10 and r < 1.59 and close > ma20 and row["ma5_512890"] > row["ma10_512890"] and tech_close < tech_ma5 and k_clv < 0.40 and market_ok
+        reasons.append("S3→S4：需要R<1.59、512890站上MA20、MA5>MA10、科技弱、市场宽度修复。")
         return ok
     return False
 
@@ -184,46 +179,40 @@ def _sell_transition(current_state: StrategyState, row: pd.Series, hard_flags: D
     if idx == 0:
         return current_state
 
+    r = row["r_tech_dividend"]
     close = row["close_512890"]
     ma5 = row["ma5_512890"]
     ma10 = row["ma10_512890"]
     ma20 = row["ma20_512890"]
     clv = row["clv_512890"]
-    external_caution = _external_caution(row)
-    external_extreme = _external_extreme(row)
+    k_clv = row["clv_588000"]
+    tech_close = row["close_588000"]
+    tech_ma5 = row["ma5_588000"]
 
     if current_state == StrategyState.S4:
-        count = sum([close < ma5, clv < 0.30, int(row["weak_clv_streak_512890"]) >= 2, external_caution, row["pct_512890"] < 0 and row["amount_512890"] > row["amount_ma5_512890"]])
+        count = sum([close < ma5, clv < 0.30, r > 1.59, tech_close > tech_ma5, row["pct_512890"] < 0 and row["amount_512890"] > row["amount_ma5_512890"]])
         if count >= 2:
             reasons.append("S4→S3：满仓优势减弱，至少两个减仓条件成立。")
             return StrategyState.S3
 
     if current_state == StrategyState.S3:
-        count = sum([close < ma10, int(row["weak_clv_streak_512890"]) >= 2, row["ret3_512890"] < 0, close < ma20 and clv < 0.50, external_extreme])
+        count = sum([close < ma10, int(row["weak_clv_streak_512890"]) >= 2, r > 1.64, tech_close > tech_ma5 and k_clv > 0.70, row["ret3_512890"] < 0])
         if count >= 3:
             reasons.append("S3→S2：主仓趋势修复失败，至少三个减仓条件成立。")
             return StrategyState.S2
 
     if current_state == StrategyState.S2:
-        count = sum([close < ma5, clv < 0.30, bool(row["new_5d_low_512890"]), row["ret3_512890"] < 0 and close < ma10, external_extreme])
+        count = sum([close < ma5, r > 1.70, clv < 0.30, bool(row["new_5d_low_512890"]), tech_close > tech_ma5 and k_clv > 0.70])
         if count >= 2:
             reasons.append("S2→S1：初步确认失败，至少两个减仓条件成立。")
             return StrategyState.S1
 
     if current_state == StrategyState.S1:
-        if bool(row["new_10d_low_512890"]) or (close < ma10 and clv < 0.30) or hard_flags.get("stop_loss", False) or (external_extreme and close < ma5):
+        if r > 1.75 or bool(row["new_10d_low_512890"]) or (close < ma10 and clv < 0.30) or hard_flags.get("stop_loss", False):
             reasons.append("S1→S0：观察仓失败，触发清仓条件。")
             return StrategyState.S0
 
     return current_state
-
-
-def _external_caution(row: pd.Series) -> bool:
-    return bool(row["r_tech_dividend"] > 1.75 and row["close_588000"] > row["ma5_588000"] and row["clv_588000"] > 0.70)
-
-
-def _external_extreme(row: pd.Series) -> bool:
-    return bool(row["r_tech_dividend"] > 1.90 and row["close_588000"] > row["ma5_588000"] and row["clv_588000"] > 0.70)
 
 
 def _hard_flags(row: pd.Series, average_cost: float | None) -> Dict[str, bool]:
