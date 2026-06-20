@@ -1,6 +1,11 @@
 name: Bootstrap Real 512890 History
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/bootstrap-history.yml"
   workflow_dispatch:
     inputs:
       lookback_days:
@@ -45,7 +50,12 @@ jobs:
           pip install -r requirements.txt
 
       - name: Bootstrap real market history
-        run: python scripts/update_daily_snapshot.py --bootstrap-history --lookback-days ${{ inputs.lookback_days }}
+        run: |
+          LOOKBACK_DAYS="${{ inputs.lookback_days }}"
+          if [ -z "$LOOKBACK_DAYS" ]; then
+            LOOKBACK_DAYS="820"
+          fi
+          python scripts/update_daily_snapshot.py --bootstrap-history --lookback-days "$LOOKBACK_DAYS"
 
       - name: Run tests
         run: pytest -q
