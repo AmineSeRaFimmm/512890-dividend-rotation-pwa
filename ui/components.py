@@ -65,7 +65,6 @@ def top_metrics(result: SignalResult) -> None:
             <div class='metric-card'>
               <div class='metric-label'>仓位管理</div>
               {state_markup}
-              <div class='metric-value'>{result.target_position_pct}%</div>
             </div>
             """,
             unsafe_allow_html=True,
