@@ -64,6 +64,7 @@ def main() -> None:
     portfolio = PortfolioState.from_dict(read_json(PORTFOLIO_STATE, default=None), capital=args.capital)
     executed_trade = apply_pending_order_if_due(portfolio, signal_date, float(latest["open_512890"]))
     current_position = portfolio.current_position_ratio(float(latest["close_512890"]))
+    state_days_held = portfolio.update_state_days_held(float(latest["close_512890"]))
 
     result = evaluate_strategy(
         enriched,
@@ -71,6 +72,7 @@ def main() -> None:
         average_cost=portfolio.average_cost,
         capital=portfolio.capital,
         cooldown_days_left=0,
+        state_days_held=state_days_held,
     )
     pending = create_pending_order(result, signal_close=float(latest["close_512890"]))
     portfolio.pending_order = pending

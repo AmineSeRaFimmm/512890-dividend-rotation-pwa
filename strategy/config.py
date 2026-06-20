@@ -25,6 +25,7 @@ class StrategyThresholds:
     sell_s2_condition_count: int = 2
     sell_s3_condition_count: int = 3
     sell_s4_condition_count: int = 2
+    min_hold_s2_days: int = 0
 
 
 def _coerce_thresholds(raw: dict[str, Any]) -> StrategyThresholds:

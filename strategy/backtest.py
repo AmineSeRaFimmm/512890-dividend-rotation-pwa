@@ -8,7 +8,7 @@ import pandas as pd
 from .execution import estimate_shares, t_plus_1_buy_execution, t_plus_1_sell_execution
 from .indicators import add_indicators
 from .models import StrategyState
-from .state_machine import evaluate_strategy
+from .state_machine import evaluate_strategy, state_from_position
 
 
 @dataclass
@@ -39,6 +39,8 @@ def run_backtest(
     equity: List[dict] = []
     state_rows: List[dict] = []
     s0_failure_rows: List[dict] = []
+    previous_state: StrategyState | None = None
+    state_days_held = 0
 
     for i in range(20, len(data) - 1):
         signal_date = pd.to_datetime(data.iloc[i]["date"])
@@ -54,7 +56,19 @@ def run_backtest(
         position_value = shares * close
         total_equity_at_signal = cash + position_value
         current_position = position_value / total_equity_at_signal if total_equity_at_signal > 0 else 0.0
-        result = evaluate_strategy(history, current_position=current_position, average_cost=avg_cost, capital=total_equity_at_signal)
+        current_state = state_from_position(current_position)
+        if current_state == previous_state:
+            state_days_held += 1
+        else:
+            previous_state = current_state
+            state_days_held = 1
+        result = evaluate_strategy(
+            history,
+            current_position=current_position,
+            average_cost=avg_cost,
+            capital=total_equity_at_signal,
+            state_days_held=state_days_held,
+        )
         next_open = float(data.iloc[i + 1]["open_512890"])
 
         state_rows.append(
@@ -66,6 +80,7 @@ def run_backtest(
                 "target_position": result.target_position,
                 "total_score": result.total_score,
                 "action": result.action,
+                "state_days_held": state_days_held,
             }
         )
         if result.current_state == StrategyState.S0:

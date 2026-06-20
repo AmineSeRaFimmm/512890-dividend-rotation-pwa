@@ -22,6 +22,7 @@
     "sell_s2_condition_count": 3,
     "sell_s3_condition_count": 3,
     "sell_s4_condition_count": 2,
+    "min_hold_s2_days": 3,
     "buy_gap_normal": 0.008,
     "buy_gap_max": 0.015,
     "abnormal_drop": -0.03,

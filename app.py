@@ -36,13 +36,14 @@ def _read_json(path: Path) -> dict:
         return {}
 
 
-def _auto_position_inputs(df: pd.DataFrame, capital: float) -> tuple[float, float | None, dict]:
+def _auto_position_inputs(df: pd.DataFrame, capital: float) -> tuple[float, float | None, int, dict]:
     portfolio = _read_json(AUTO_PORTFOLIO)
     latest_close = float(df.iloc[-1]["close_512890"])
     shares = int(portfolio.get("shares_512890", 0))
     position_ratio = (shares * latest_close) / float(portfolio.get("capital", capital) or capital)
     average_cost = portfolio.get("average_cost")
-    return position_ratio, average_cost, portfolio
+    state_days_held = int(portfolio.get("state_days_held", 0))
+    return position_ratio, average_cost, state_days_held, portfolio
 
 
 def _backtest_start_date(df: pd.DataFrame, period_label: str) -> pd.Timestamp:
@@ -83,7 +84,7 @@ else:
 
 enriched = add_indicators(df)
 latest_signal = _read_json(LATEST_SIGNAL)
-current_position, average_cost, portfolio = _auto_position_inputs(enriched, CAPITAL) if data_mode == "自动更新数据" else (0.0, None, {})
+current_position, average_cost, state_days_held, portfolio = _auto_position_inputs(enriched, CAPITAL) if data_mode == "自动更新数据" else (0.0, None, 0, {})
 
 result = evaluate_strategy(
     enriched,
@@ -91,6 +92,7 @@ result = evaluate_strategy(
     average_cost=average_cost,
     capital=CAPITAL,
     cooldown_days_left=0,
+    state_days_held=state_days_held,
 )
 
 hero(result)

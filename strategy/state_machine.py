@@ -41,6 +41,7 @@ def evaluate_strategy(
     average_cost: float | None = None,
     capital: float = 100_000,
     cooldown_days_left: int = 0,
+    state_days_held: int | None = None,
 ) -> SignalResult:
     data = add_indicators(df)
     row = data.iloc[-1]
@@ -68,7 +69,7 @@ def evaluate_strategy(
     reasons: List[str] = []
 
     candidate_state = base_state_from_score(total_score)
-    target_state = _apply_transition_rules(current_state, candidate_state, row, total_score, hard_flags, cooldown_days_left, reasons, warnings)
+    target_state = _apply_transition_rules(current_state, candidate_state, row, total_score, hard_flags, cooldown_days_left, reasons, warnings, state_days_held)
 
     current_pos = STATE_POSITION[current_state]
     target_pos = STATE_POSITION[target_state]
@@ -112,7 +113,9 @@ def _apply_transition_rules(
     cooldown_days_left: int,
     reasons: List[str],
     warnings: List[str],
+    state_days_held: int | None,
 ) -> StrategyState:
+    thresholds = load_strategy_thresholds()
     current_idx = STATE_ORDER.index(current_state)
 
     # 全局风控优先：异常下跌至少降低一档。
@@ -123,6 +126,10 @@ def _apply_transition_rules(
     # 按仓位逐级卖出，避免总分高时掩盖破位风险。
     sell_state = _sell_transition(current_state, row, hard_flags, reasons)
     if STATE_ORDER.index(sell_state) < current_idx:
+        held_days = 10**9 if state_days_held is None else int(state_days_held)
+        if current_state == StrategyState.S2 and thresholds.min_hold_s2_days > 0 and held_days < thresholds.min_hold_s2_days and not hard_flags.get("stop_loss", False):
+            warnings.append(f"S2最短持有期：已持有{held_days}个信号日，未满{thresholds.min_hold_s2_days}个信号日，暂缓降仓。")
+            return current_state
         return sell_state
 
     # 冷却期不允许新增买入。

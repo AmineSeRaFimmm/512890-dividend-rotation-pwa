@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from .execution import estimate_shares, t_plus_1_buy_execution, t_plus_1_sell_execution
+from .state_machine import state_from_position
 
 
 DEFAULT_CAPITAL = 100_000.0
@@ -17,6 +18,8 @@ class PortfolioState:
     average_cost: float | None = None
     pending_order: dict[str, Any] | None = None
     last_update: str | None = None
+    signal_state: str | None = None
+    state_days_held: int = 0
     trade_log: list[dict[str, Any]] = field(default_factory=list)
 
     @classmethod
@@ -30,6 +33,8 @@ class PortfolioState:
             average_cost=payload.get("average_cost"),
             pending_order=payload.get("pending_order"),
             last_update=payload.get("last_update"),
+            signal_state=payload.get("signal_state"),
+            state_days_held=int(payload.get("state_days_held", 0)),
             trade_log=list(payload.get("trade_log", [])),
         )
 
@@ -44,11 +49,22 @@ class PortfolioState:
             "current_position_ratio": 0.0 if latest_close is None else position_value / self.capital,
             "pending_order": self.pending_order,
             "last_update": self.last_update,
+            "signal_state": self.signal_state,
+            "state_days_held": self.state_days_held,
             "trade_log": self.trade_log[-200:],
         }
 
     def current_position_ratio(self, latest_close: float) -> float:
         return (self.shares_512890 * latest_close) / self.capital
+
+    def update_state_days_held(self, latest_close: float) -> int:
+        current_state = state_from_position(self.current_position_ratio(latest_close)).value
+        if current_state == self.signal_state:
+            self.state_days_held += 1
+        else:
+            self.signal_state = current_state
+            self.state_days_held = 1
+        return self.state_days_held
 
 
 def apply_pending_order_if_due(state: PortfolioState, trade_date: str, open_price: float) -> dict[str, Any] | None:
