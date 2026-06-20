@@ -1,14 +1,6 @@
 name: Update Daily 512890 Signal
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - ".github/workflows/daily-signal.yml"
-      - "scripts/update_daily_snapshot.py"
-      - "strategy/market_fetcher.py"
-      - "requirements.txt"
   schedule:
     # 18:15 Asia/Shanghai, after A-share market data should be settled.
     - cron: "15 10 * * 1-5"
