@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from dataclasses import dataclass
 from datetime import date, timedelta
 from typing import Iterable
@@ -74,27 +75,7 @@ def _fetch_etf_daily(symbol: str, start: date, end: date) -> pd.DataFrame:
 
 
 def _fetch_etf_daily_eastmoney_direct(symbol: str, start: date, end: date) -> pd.DataFrame:
-    import requests
-
-    secid = f"1.{symbol}"
-    url = "https://push2his.eastmoney.com/api/qt/stock/kline/get"
-    params = {
-        "secid": secid,
-        "fields1": "f1,f2,f3,f4,f5,f6",
-        "fields2": "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
-        "klt": "101",
-        "fqt": "0",
-        "beg": start.strftime("%Y%m%d"),
-        "end": end.strftime("%Y%m%d"),
-        "lmt": "1000000",
-    }
-    headers = {
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/125 Safari/537.36",
-        "Referer": "https://quote.eastmoney.com/",
-    }
-    response = requests.get(url, params=params, headers=headers, timeout=20)
-    response.raise_for_status()
-    payload = response.json()
+    payload = _request_eastmoney_kline_payload(symbol=symbol, start=start, end=end)
     klines = (((payload or {}).get("data") or {}).get("klines") or [])
     if not klines:
         raise RuntimeError(f"东方财富接口未返回ETF {symbol} 的K线。")
@@ -118,6 +99,42 @@ def _fetch_etf_daily_eastmoney_direct(symbol: str, start: date, end: date) -> pd
     if not rows:
         raise RuntimeError(f"东方财富接口返回ETF {symbol} 的K线格式异常。")
     return _normalize_akshare_ohlcv(pd.DataFrame(rows))
+
+
+def _request_eastmoney_kline_payload(symbol: str, start: date, end: date) -> dict:
+    import requests
+
+    url = "https://push2his.eastmoney.com/api/qt/stock/kline/get"
+    params = {
+        "secid": f"1.{symbol}",
+        "fields1": "f1,f2,f3,f4,f5,f6",
+        "fields2": "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+        "klt": "101",
+        "fqt": "0",
+        "beg": start.strftime("%Y%m%d"),
+        "end": end.strftime("%Y%m%d"),
+        "lmt": "1000000",
+    }
+    headers = {
+        "Accept": "application/json,text/plain,*/*",
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+        "Connection": "close",
+        "Host": "push2his.eastmoney.com",
+        "Referer": "https://quote.eastmoney.com/",
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/125 Safari/537.36",
+    }
+    last_error: Exception | None = None
+    for attempt in range(1, 6):
+        try:
+            with requests.Session() as session:
+                response = session.get(url, params=params, headers=headers, timeout=(8, 35))
+                response.raise_for_status()
+                return response.json()
+        except Exception as exc:  # pragma: no cover - network dependent
+            last_error = exc
+            if attempt < 5:
+                time.sleep(min(2 * attempt, 8))
+    raise RuntimeError(f"东方财富ETF {symbol} K线接口连续重试失败: {last_error}")
 
 
 def _fetch_etf_daily_akshare(symbol: str, start: date, end: date) -> pd.DataFrame:
