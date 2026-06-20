@@ -13,11 +13,6 @@ on:
     # 18:15 Asia/Shanghai, after A-share market data should be settled.
     - cron: "15 10 * * 1-5"
   workflow_dispatch:
-    inputs:
-      end_date:
-        description: "Optional YYYY-MM-DD end date for reproducible manual live runs"
-        required: false
-        type: string
 
 concurrency:
   group: daily-512890-signal
@@ -48,12 +43,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Update daily signal snapshot from real market data
-        run: |
-          ARGS="--lookback-days 820"
-          if [ -n "${{ inputs.end_date }}" ]; then
-            ARGS="$ARGS --end-date ${{ inputs.end_date }}"
-          fi
-          python scripts/update_daily_snapshot.py $ARGS
+        run: python scripts/update_daily_snapshot.py --lookback-days 820
 
       - name: Run tests
         run: pytest -q
