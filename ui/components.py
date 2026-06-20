@@ -38,10 +38,7 @@ def top_metrics(result: SignalResult) -> None:
         st.markdown(
             f"""
             <div class='metric-card'>
-              <div class='metric-head'>
-                <div class='metric-label'>总分</div>
-                <div class='status-pill'>{result.target_state.value}</div>
-              </div>
+              <div class='metric-label'>总分</div>
               <div class='metric-value'>{result.total_score}/12</div>
               <div class='metric-note'>四类信号综合评分</div>
             </div>
@@ -49,10 +46,25 @@ def top_metrics(result: SignalResult) -> None:
             unsafe_allow_html=True,
         )
     with c2:
+        if result.current_state == result.target_state:
+            state_markup = f"""
+              <div class='position-flow-single'>
+                <div class='status-pill'>{result.target_state.value}</div>
+              </div>
+            """
+        else:
+            state_markup = f"""
+              <div class='position-flow'>
+                <div class='state-button state-button-from'>{result.current_state.value}</div>
+                <div class='state-arrow'>→</div>
+                <div class='state-button state-button-to'>{result.target_state.value}</div>
+              </div>
+            """
         st.markdown(
             f"""
             <div class='metric-card'>
-              <div class='metric-label'>目标仓位</div>
+              <div class='metric-label'>仓位管理</div>
+              {state_markup}
               <div class='metric-value'>{result.target_position_pct}%</div>
             </div>
             """,
