@@ -6,6 +6,7 @@ from typing import Dict, List, Tuple
 import pandas as pd
 
 from .indicators import add_indicators
+from .config import load_strategy_thresholds
 from .models import SignalCard, SignalResult, STATE_ORDER, STATE_POSITION, StrategyState
 from .scoring import score_relative_strength, score_support, score_tech, score_trend
 
@@ -142,6 +143,7 @@ def _apply_transition_rules(
 
 
 def _buy_gate(current_state: StrategyState, next_state: StrategyState, row: pd.Series, total_score: int, reasons: List[str]) -> bool:
+    thresholds = load_strategy_thresholds()
     r = row["r_tech_dividend"]
     close = row["close_512890"]
     ma5 = row["ma5_512890"]
@@ -155,26 +157,27 @@ def _buy_gate(current_state: StrategyState, next_state: StrategyState, row: pd.S
     amount_ma5 = row["amount_ma5_512890"]
 
     if next_state == StrategyState.S1:
-        ok = total_score >= 4 and r < 1.70 and clv >= 0.60 and not bool(row["new_5d_low_512890"]) and amount >= amount_ma5 * 0.8
-        reasons.append("S0→S1：需要R<1.70、CLV≥0.60、未创5日新低、成交额不低于5日均额80%。")
+        ok = total_score >= 4 and r < thresholds.r_warning and clv >= thresholds.clv_support and not bool(row["new_5d_low_512890"]) and amount >= amount_ma5 * 0.8
+        reasons.append(f"S0→S1：需要R<{thresholds.r_warning:.2f}、CLV≥{thresholds.clv_support:.2f}、未创5日新低、成交额不低于5日均额80%。")
         return ok
     if next_state == StrategyState.S2:
-        ok = total_score >= 6 and r < 1.64 and close > ma5 and (int(row["strong_clv_streak_512890"]) >= 2 or clv >= 0.70) and (k_clv < 0.50 or tech_close < tech_ma5)
-        reasons.append("S1→S2：需要R<1.64、512890站上MA5、承接增强、科技钝化或跌破MA5。")
+        ok = total_score >= 6 and r < thresholds.r_confirm and close > ma5 and (int(row["strong_clv_streak_512890"]) >= 2 or clv >= thresholds.s1_confirm_clv) and (k_clv < 0.50 or tech_close < tech_ma5)
+        reasons.append(f"S1→S2：需要R<{thresholds.r_confirm:.2f}、512890站上MA5、承接增强、科技钝化或跌破MA5。")
         return ok
     if next_state == StrategyState.S3:
-        ok = total_score >= 8 and r < 1.64 and bool(row["r_ma3_falling"]) and close > ma10 and int(row["strong_clv_streak_512890"]) >= 3 and (tech_close < tech_ma5 or k_clv < 0.40)
-        reasons.append("S2→S3：需要R<1.64且3日均线下行、512890站上MA10、连续3日强承接、科技转弱。")
+        ok = total_score >= 8 and r < thresholds.r_confirm and bool(row["r_ma3_falling"]) and close > ma10 and int(row["strong_clv_streak_512890"]) >= thresholds.s2_strong_clv_streak and (tech_close < tech_ma5 or k_clv < 0.40)
+        reasons.append(f"S2→S3：需要R<{thresholds.r_confirm:.2f}且3日均线下行、512890站上MA10、连续{thresholds.s2_strong_clv_streak}日强承接、科技转弱。")
         return ok
     if next_state == StrategyState.S4:
         market_ok = True if pd.isna(row.get("market_up_ratio")) else row.get("market_up_ratio") >= 0.45
-        ok = total_score >= 10 and r < 1.59 and close > ma20 and row["ma5_512890"] > row["ma10_512890"] and tech_close < tech_ma5 and k_clv < 0.40 and market_ok
-        reasons.append("S3→S4：需要R<1.59、512890站上MA20、MA5>MA10、科技弱、市场宽度修复。")
+        ok = total_score >= 10 and r < thresholds.r_strong and close > ma20 and row["ma5_512890"] > row["ma10_512890"] and tech_close < tech_ma5 and k_clv < 0.40 and market_ok
+        reasons.append(f"S3→S4：需要R<{thresholds.r_strong:.2f}、512890站上MA20、MA5>MA10、科技弱、市场宽度修复。")
         return ok
     return False
 
 
 def _sell_transition(current_state: StrategyState, row: pd.Series, hard_flags: Dict[str, bool], reasons: List[str]) -> StrategyState:
+    thresholds = load_strategy_thresholds()
     idx = STATE_ORDER.index(current_state)
     if idx == 0:
         return current_state
@@ -190,25 +193,25 @@ def _sell_transition(current_state: StrategyState, row: pd.Series, hard_flags: D
     tech_ma5 = row["ma5_588000"]
 
     if current_state == StrategyState.S4:
-        count = sum([close < ma5, clv < 0.30, r > 1.59, tech_close > tech_ma5, row["pct_512890"] < 0 and row["amount_512890"] > row["amount_ma5_512890"]])
-        if count >= 2:
-            reasons.append("S4→S3：满仓优势减弱，至少两个减仓条件成立。")
+        count = sum([close < ma5, clv < thresholds.clv_weak, r > thresholds.r_strong, tech_close > tech_ma5, row["pct_512890"] < 0 and row["amount_512890"] > row["amount_ma5_512890"]])
+        if count >= thresholds.sell_s4_condition_count:
+            reasons.append(f"S4→S3：满仓优势减弱，至少{thresholds.sell_s4_condition_count}个减仓条件成立。")
             return StrategyState.S3
 
     if current_state == StrategyState.S3:
-        count = sum([close < ma10, int(row["weak_clv_streak_512890"]) >= 2, r > 1.64, tech_close > tech_ma5 and k_clv > 0.70, row["ret3_512890"] < 0])
-        if count >= 3:
-            reasons.append("S3→S2：主仓趋势修复失败，至少三个减仓条件成立。")
+        count = sum([close < ma10, int(row["weak_clv_streak_512890"]) >= 2, r > thresholds.r_confirm, tech_close > tech_ma5 and k_clv > thresholds.clv_strong, row["ret3_512890"] < 0])
+        if count >= thresholds.sell_s3_condition_count:
+            reasons.append(f"S3→S2：主仓趋势修复失败，至少{thresholds.sell_s3_condition_count}个减仓条件成立。")
             return StrategyState.S2
 
     if current_state == StrategyState.S2:
-        count = sum([close < ma5, r > 1.70, clv < 0.30, bool(row["new_5d_low_512890"]), tech_close > tech_ma5 and k_clv > 0.70])
-        if count >= 2:
-            reasons.append("S2→S1：初步确认失败，至少两个减仓条件成立。")
+        count = sum([close < ma5, r > thresholds.r_warning, clv < thresholds.clv_weak, bool(row["new_5d_low_512890"]), tech_close > tech_ma5 and k_clv > thresholds.clv_strong])
+        if count >= thresholds.sell_s2_condition_count:
+            reasons.append(f"S2→S1：初步确认失败，至少{thresholds.sell_s2_condition_count}个减仓条件成立。")
             return StrategyState.S1
 
     if current_state == StrategyState.S1:
-        if r > 1.75 or bool(row["new_10d_low_512890"]) or (close < ma10 and clv < 0.30) or hard_flags.get("stop_loss", False):
+        if r > thresholds.r_absorb or bool(row["new_10d_low_512890"]) or (close < ma10 and clv < thresholds.clv_weak) or hard_flags.get("stop_loss", False):
             reasons.append("S1→S0：观察仓失败，触发清仓条件。")
             return StrategyState.S0
 
