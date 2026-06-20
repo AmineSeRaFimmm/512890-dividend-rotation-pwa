@@ -66,6 +66,14 @@ def _s0_failure_summary(failures: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame([{"失败条件": k, "次数": v} for k, v in counts.items()]).sort_values("次数", ascending=False)
 
 
+@st.cache_data(show_spinner=False)
+def _cached_backtest(csv_payload: str, start_date: str, end_date: str, capital: float):
+    from io import StringIO
+
+    cached_df = pd.read_csv(StringIO(csv_payload))
+    return run_backtest(cached_df, initial_capital=capital, start_date=start_date, end_date=end_date)
+
+
 if live_data_exists():
     df = load_live_data()
     data_mode = "自动更新数据"
@@ -114,62 +122,67 @@ with backtest_tab:
     start_date = _backtest_start_date(enriched, period_label)
     end_date = pd.to_datetime(enriched["date"]).max()
     st.caption(f"当前区间：{start_date.date()} 至 {end_date.date()}。区间内以初始资金重新独立回测，区间前数据仅用于均线和信号预热。")
-    bt = run_backtest(enriched, initial_capital=CAPITAL, start_date=start_date, end_date=end_date)
-
-    strategy_return = bt.metrics.get("total_return", 0.0)
-    benchmark_return = bt.metrics.get("benchmark_total_return", 0.0)
-    excess_return = bt.metrics.get("excess_return", strategy_return - benchmark_return)
-    average_position = bt.diagnostics.get("average_position", 0.0)
-    exposure_ratio = bt.diagnostics.get("exposure_ratio", 0.0)
-    s0_ratio = bt.diagnostics.get("s0_ratio", 0.0)
-
-    m1, m2, m3, m4 = st.columns(4)
-    m1.metric("策略累计收益", f"{strategy_return*100:.2f}%")
-    m2.metric("512890持有收益", f"{benchmark_return*100:.2f}%")
-    m3.metric("超额收益", f"{excess_return*100:.2f}%")
-    m4.metric("最终权益", f"¥{bt.metrics.get('final_equity', CAPITAL):,.0f}")
-
-    d1, d2, d3, d4 = st.columns(4)
-    d1.metric("策略最大回撤", f"{bt.metrics.get('max_drawdown', 0)*100:.2f}%")
-    d2.metric("512890最大回撤", f"{bt.metrics.get('benchmark_max_drawdown', 0)*100:.2f}%")
-    d3.metric("平均仓位", f"{average_position*100:.1f}%")
-    d4.metric("交易次数", f"{bt.metrics.get('trade_count', 0)}")
-
-    if not bt.equity_curve.empty:
-        import plotly.graph_objects as go
-
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=bt.equity_curve["date"], y=bt.equity_curve["equity"], mode="lines", name="策略权益"))
-        if not bt.benchmark_curve.empty:
-            fig.add_trace(go.Scatter(x=bt.benchmark_curve["date"], y=bt.benchmark_curve["equity"], mode="lines", name="512890买入持有"))
-        fig.update_layout(height=360, margin=dict(l=20, r=20, t=30, b=20), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(255,255,255,0.4)")
-        st.plotly_chart(fig, use_container_width=True)
+    run_requested = st.button("运行回测", type="primary", use_container_width=True)
+    if not run_requested:
+        st.info("为避免PWA首页加载过慢，回测不会在页面打开时自动执行。选择区间后点击“运行回测”。")
     else:
-        st.info("当前区间可用于回测的数据不足。请先完成两年真实历史数据建库，或选择更长区间。")
+        with st.spinner("正在计算回测、基准与S0诊断……"):
+            bt = _cached_backtest(enriched.to_csv(index=False), str(start_date.date()), str(end_date.date()), CAPITAL)
 
-    st.markdown("#### 仓位与状态诊断")
-    c1, c2, c3 = st.columns(3)
-    c1.metric("持仓暴露率", f"{exposure_ratio*100:.1f}%")
-    c2.metric("S0空仓状态占比", f"{s0_ratio*100:.1f}%")
-    c3.metric("S0→S1失败天数", f"{bt.diagnostics.get('s0_failure_days', 0)}")
+        strategy_return = bt.metrics.get("total_return", 0.0)
+        benchmark_return = bt.metrics.get("benchmark_total_return", 0.0)
+        excess_return = bt.metrics.get("excess_return", strategy_return - benchmark_return)
+        average_position = bt.diagnostics.get("average_position", 0.0)
+        exposure_ratio = bt.diagnostics.get("exposure_ratio", 0.0)
+        s0_ratio = bt.diagnostics.get("s0_ratio", 0.0)
 
-    state_counts = bt.diagnostics.get("state_counts", {})
-    if state_counts:
-        state_df = pd.DataFrame([{"状态": k, "天数": v, "占比": bt.diagnostics.get("state_ratios", {}).get(k, 0)} for k, v in state_counts.items()])
-        state_df["占比"] = state_df["占比"].map(lambda x: f"{x*100:.1f}%")
-        st.dataframe(state_df, use_container_width=True, hide_index=True)
+        m1, m2, m3, m4 = st.columns(4)
+        m1.metric("策略累计收益", f"{strategy_return*100:.2f}%")
+        m2.metric("512890持有收益", f"{benchmark_return*100:.2f}%")
+        m3.metric("超额收益", f"{excess_return*100:.2f}%")
+        m4.metric("最终权益", f"¥{bt.metrics.get('final_equity', CAPITAL):,.0f}")
 
-    st.markdown("#### S0→S1失败条件统计")
-    failure_summary = _s0_failure_summary(bt.s0_gate_failures)
-    if failure_summary.empty:
-        st.success("当前区间没有明显的S0→S1失败记录，或区间内未处于S0空仓状态。")
-    else:
-        st.dataframe(failure_summary, use_container_width=True, hide_index=True)
-        with st.expander("查看逐日S0诊断明细"):
-            st.dataframe(bt.s0_gate_failures, use_container_width=True, hide_index=True)
+        d1, d2, d3, d4 = st.columns(4)
+        d1.metric("策略最大回撤", f"{bt.metrics.get('max_drawdown', 0)*100:.2f}%")
+        d2.metric("512890最大回撤", f"{bt.metrics.get('benchmark_max_drawdown', 0)*100:.2f}%")
+        d3.metric("平均仓位", f"{average_position*100:.1f}%")
+        d4.metric("交易次数", f"{bt.metrics.get('trade_count', 0)}")
 
-    st.markdown("#### 交易记录")
-    st.dataframe(bt.trades, use_container_width=True, hide_index=True)
+        if not bt.equity_curve.empty:
+            import plotly.graph_objects as go
+
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(x=bt.equity_curve["date"], y=bt.equity_curve["equity"], mode="lines", name="策略权益"))
+            if not bt.benchmark_curve.empty:
+                fig.add_trace(go.Scatter(x=bt.benchmark_curve["date"], y=bt.benchmark_curve["equity"], mode="lines", name="512890买入持有"))
+            fig.update_layout(height=360, margin=dict(l=20, r=20, t=30, b=20), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(255,255,255,0.4)")
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("当前区间可用于回测的数据不足。请先完成两年真实历史数据建库，或选择更长区间。")
+
+        st.markdown("#### 仓位与状态诊断")
+        c1, c2, c3 = st.columns(3)
+        c1.metric("持仓暴露率", f"{exposure_ratio*100:.1f}%")
+        c2.metric("S0空仓状态占比", f"{s0_ratio*100:.1f}%")
+        c3.metric("S0→S1失败天数", f"{bt.diagnostics.get('s0_failure_days', 0)}")
+
+        state_counts = bt.diagnostics.get("state_counts", {})
+        if state_counts:
+            state_df = pd.DataFrame([{"状态": k, "天数": v, "占比": bt.diagnostics.get("state_ratios", {}).get(k, 0)} for k, v in state_counts.items()])
+            state_df["占比"] = state_df["占比"].map(lambda x: f"{x*100:.1f}%")
+            st.dataframe(state_df, use_container_width=True, hide_index=True)
+
+        st.markdown("#### S0→S1失败条件统计")
+        failure_summary = _s0_failure_summary(bt.s0_gate_failures)
+        if failure_summary.empty:
+            st.success("当前区间没有明显的S0→S1失败记录，或区间内未处于S0空仓状态。")
+        else:
+            st.dataframe(failure_summary, use_container_width=True, hide_index=True)
+            with st.expander("查看逐日S0诊断明细"):
+                st.dataframe(bt.s0_gate_failures, use_container_width=True, hide_index=True)
+
+        st.markdown("#### 交易记录")
+        st.dataframe(bt.trades, use_container_width=True, hide_index=True)
 
 with data_tab:
     st.markdown("### 行情数据")
