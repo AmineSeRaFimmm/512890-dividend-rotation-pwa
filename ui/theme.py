@@ -6,12 +6,12 @@ import streamlit.components.v1 as components
 
 def set_page() -> None:
     st.set_page_config(
-        page_title="512890 红利低波信号系统",
+        page_title="静澜红利",
         page_icon="📈",
         layout="wide",
-        initial_sidebar_state="expanded",
+        initial_sidebar_state="collapsed",
         menu_items={
-            "About": "512890红利低波风格轮动信号系统。仅用于研究和可视化，不构成投资建议。"
+            "About": "静澜红利：512890红利低波风格轮动信号系统。仅用于研究和可视化，不构成投资建议。"
         },
     )
 
@@ -33,7 +33,8 @@ def inject_css() -> None:
             --ios-purple: #B8A4D9;
         }
         .stApp { background: radial-gradient(circle at top left, #FFFFFF 0, #F7F8FB 42%, #EEF3F8 100%); }
-        section[data-testid="stSidebar"] { background: rgba(255,255,255,0.58); backdrop-filter: blur(20px); border-right: 1px solid var(--ios-stroke); }
+        section[data-testid="stSidebar"] { display: none; }
+        button[kind="header"] { display: none; }
         .block-container { padding-top: 2rem; padding-bottom: 4rem; max-width: 1280px; }
         .hero-card, .ios-card {
             border: 1px solid var(--ios-stroke);
@@ -43,17 +44,18 @@ def inject_css() -> None:
             padding: 24px 26px;
             backdrop-filter: blur(20px);
         }
-        .hero-title { font-size: 34px; font-weight: 760; letter-spacing: -0.04em; color: var(--ios-text); line-height: 1.12; margin-bottom: 8px; }
+        .hero-title { font-size: 38px; font-weight: 760; letter-spacing: -0.04em; color: var(--ios-text); line-height: 1.12; margin-bottom: 8px; }
         .hero-subtitle { color: var(--ios-muted); font-size: 15px; line-height: 1.65; }
         .status-pill {
             display: inline-flex; align-items: center; gap: 8px; padding: 8px 13px; border-radius: 999px;
             background: rgba(122,156,198,0.13); color: #405D7C; font-weight: 650; font-size: 13px;
-            border: 1px solid rgba(122,156,198,0.18);
+            border: 1px solid rgba(122,156,198,0.18); white-space: nowrap;
         }
         .metric-card {
             border: 1px solid var(--ios-stroke); background: rgba(255,255,255,0.78); border-radius: 24px;
             padding: 18px 18px; min-height: 126px; box-shadow: 0 10px 28px rgba(31,41,55,0.055);
         }
+        .metric-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
         .metric-label { color: var(--ios-muted); font-size: 13px; font-weight: 560; }
         .metric-value { color: var(--ios-text); font-size: 30px; font-weight: 760; letter-spacing: -0.035em; margin-top: 8px; }
         .metric-note { color: var(--ios-muted); font-size: 12px; margin-top: 10px; line-height: 1.45; }
@@ -105,7 +107,7 @@ def inject_pwa_tags() -> None:
         upsertLink('manifest', 'app/static/manifest.json');
         upsertLink('apple-touch-icon', 'app/static/icon.svg');
         upsertMeta('apple-mobile-web-app-capable', 'yes');
-        upsertMeta('apple-mobile-web-app-title', '512890 Signals');
+        upsertMeta('apple-mobile-web-app-title', '静澜红利');
         upsertMeta('apple-mobile-web-app-status-bar-style', 'default');
         upsertMeta('theme-color', '#F7F8FB');
         </script>
