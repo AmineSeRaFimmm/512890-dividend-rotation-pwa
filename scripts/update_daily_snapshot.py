@@ -24,13 +24,14 @@ LATEST_SIGNAL = DATA_DIR / "latest_signal.json"
 PORTFOLIO_STATE = DATA_DIR / "auto_portfolio.json"
 SIGNAL_HISTORY = DATA_DIR / "signal_history.csv"
 UPDATE_LOG = DATA_DIR / "update_log.json"
+REAL_HISTORY_LOOKBACK_DAYS = 820
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Update 512890 daily data and signal snapshot after market close.")
-    parser.add_argument("--offline-sample", action="store_true", help="Use bundled sample data instead of live AKShare fetch.")
+    parser.add_argument("--offline-sample", action="store_true", help="Use bundled sample data only for local tests, never for production Actions.")
     parser.add_argument("--capital", type=float, default=100_000.0)
-    parser.add_argument("--lookback-days", type=int, default=120)
+    parser.add_argument("--lookback-days", type=int, default=REAL_HISTORY_LOOKBACK_DAYS)
     parser.add_argument("--end-date", type=str, default=None, help="YYYY-MM-DD, mostly for reproducible tests.")
     return parser.parse_args()
 
@@ -47,7 +48,7 @@ def main() -> None:
         incoming = fetch_daily_market_data(end_date=end_date, config=FetchConfig(lookback_days=args.lookback_days))
         source = "akshare_eastmoney_etf"
 
-    merged = _merge_existing(LIVE_DATA, incoming)
+    merged = _merge_existing(LIVE_DATA, incoming, source=source)
     merged.to_csv(LIVE_DATA, index=False, encoding="utf-8-sig")
 
     enriched = add_indicators(merged)
@@ -81,17 +82,35 @@ def main() -> None:
     write_signal_json(result, LATEST_SIGNAL, extra=extra)
     write_json(PORTFOLIO_STATE, portfolio.to_dict(latest_close=float(latest["close_512890"])))
     _append_signal_history(result, extra)
-    write_json(UPDATE_LOG, {"last_update": portfolio.last_update, "source": source, "rows": int(len(merged)), "latest_date": signal_date})
+    write_json(
+        UPDATE_LOG,
+        {
+            "last_update": portfolio.last_update,
+            "source": source,
+            "rows": int(len(merged)),
+            "latest_date": signal_date,
+            "lookback_days": int(args.lookback_days),
+            "data_policy": "production Actions must use real AKShare/Eastmoney ETF daily bars; offline sample is local-test only.",
+        },
+    )
 
-    print(f"Updated {LIVE_DATA} rows={len(merged)} latest={signal_date}")
+    print(f"Updated {LIVE_DATA} rows={len(merged)} latest={signal_date} source={source}")
     print(f"Signal: {result.target_state.value} action={result.action} amount={result.action_amount:.2f}")
 
 
-def _merge_existing(path: Path, incoming: pd.DataFrame) -> pd.DataFrame:
+def _merge_existing(path: Path, incoming: pd.DataFrame, source: str) -> pd.DataFrame:
     incoming = validate_price_frame(incoming)
     if path.exists():
         existing = load_csv(path)
-        merged = pd.concat([existing, incoming], ignore_index=True)
+        if source == "akshare_eastmoney_etf":
+            existing_dates = set(pd.to_datetime(existing["date"]).dt.date)
+            incoming_dates = set(pd.to_datetime(incoming["date"]).dt.date)
+            if existing_dates and existing_dates.issubset(incoming_dates):
+                merged = incoming
+            else:
+                merged = pd.concat([existing, incoming], ignore_index=True)
+        else:
+            merged = pd.concat([existing, incoming], ignore_index=True)
     else:
         merged = incoming
     merged = merged.drop_duplicates(subset=["date"], keep="last").sort_values("date").reset_index(drop=True)
