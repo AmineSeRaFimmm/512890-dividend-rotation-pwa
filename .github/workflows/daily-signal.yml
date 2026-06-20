@@ -16,7 +16,7 @@ on:
 
 concurrency:
   group: daily-512890-signal
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -26,10 +26,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - name: Checkout
+      - name: Checkout latest main
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
+
+      - name: Sync latest remote main
+        run: |
+          git fetch origin main
+          git checkout main
+          git pull --ff-only origin main
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -57,5 +64,6 @@ jobs:
             echo "No data changes to commit."
           else
             git commit -m "chore: update real 512890 market history"
-            git push
+            git pull --rebase origin main
+            git push origin main
           fi
