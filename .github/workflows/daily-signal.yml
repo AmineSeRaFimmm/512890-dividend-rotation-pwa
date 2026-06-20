@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: daily-512890-signal
+  group: 512890-data-update
   cancel-in-progress: true
 
 permissions:
@@ -24,7 +24,7 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 30
     steps:
       - name: Checkout latest main
         uses: actions/checkout@v4
@@ -49,8 +49,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Update daily signal snapshot from real market data
-        run: python scripts/update_daily_snapshot.py --lookback-days 820
+      - name: Update daily signal snapshot from recent real market data
+        run: python scripts/update_daily_snapshot.py --lookback-days 15
 
       - name: Run tests
         run: pytest -q
@@ -63,7 +63,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No data changes to commit."
           else
-            git commit -m "chore: update real 512890 market history"
+            git commit -m "chore: update daily 512890 signal snapshot"
             git pull --rebase origin main
             git push origin main
           fi
