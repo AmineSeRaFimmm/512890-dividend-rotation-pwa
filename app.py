@@ -77,17 +77,8 @@ with main_tab:
         st.plotly_chart(r_chart(enriched), use_container_width=True)
 
 with signal_tab:
-    st.markdown("### 当日原始指标")
-    st.json(result.raw)
-    st.markdown("### 硬性标记")
-    st.json(result.hard_flags)
     st.markdown("### 四信号得分")
     st.dataframe(pd.DataFrame([c.__dict__ for c in result.cards]), use_container_width=True, hide_index=True)
-    if data_mode == "自动更新数据":
-        st.markdown("### 自动组合状态")
-        st.json(portfolio)
-        st.markdown("### 最新信号JSON")
-        st.json(latest_signal)
 
 with backtest_tab:
     st.markdown("### 策略回测")
