@@ -1,5 +1,5 @@
 {
-  "last_update": "2026-06-20T13:15:27",
+  "last_update": "2026-06-20T13:18:03",
   "source": "512890:sina_direct;588000:sina_direct",
   "amount_basis": "512890:reported_or_close_times_volume;588000:reported_or_close_times_volume",
   "update_mode": "bootstrap_history",
