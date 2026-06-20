@@ -64,20 +64,6 @@ top_metrics(result)
 st.write("")
 signal_cards(result)
 
-if data_mode == "自动更新数据" and latest_signal:
-    auto = latest_signal.get("auto_update", {})
-    pending = auto.get("next_execution")
-    executed = auto.get("executed_trade_from_previous_signal")
-    st.markdown("### 自动更新状态")
-    c1, c2, c3 = st.columns(3)
-    c1.info(f"信号日期：{auto.get('signal_date', latest_signal.get('date', result.date))}")
-    c2.info(f"数据源：{auto.get('source', 'N/A')}")
-    c3.info(f"下一步：{pending.get('side', 'HOLD') if pending else 'HOLD'}")
-    if pending:
-        st.caption(f"待执行计划：{pending.get('side')}，计划金额 ¥{pending.get('planned_amount', 0):,.0f}，下一交易日开盘执行。")
-    if executed:
-        st.caption(f"上一信号执行记录：{executed.get('side')} {executed.get('shares')}份，金额 ¥{executed.get('executed_amount', 0):,.0f}，状态 {executed.get('execution_status')}。")
-
 main_tab, signal_tab, backtest_tab, data_tab, rules_tab = st.tabs(["总览", "信号细节", "回测", "数据", "规则说明"])
 
 with main_tab:
