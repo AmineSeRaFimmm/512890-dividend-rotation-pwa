@@ -6,6 +6,7 @@ from typing import List
 import pandas as pd
 
 from .execution import estimate_shares, t_plus_1_buy_execution, t_plus_1_sell_execution
+from .config import load_strategy_thresholds
 from .indicators import add_indicators
 from .models import StrategyState
 from .state_machine import evaluate_strategy, state_from_position
@@ -157,10 +158,11 @@ def _buy_and_hold_512890(data: pd.DataFrame, initial_capital: float, start_ts: p
 
 
 def _s0_gate_diagnostic_row(signal_date: str, row: pd.Series, total_score: int) -> dict:
+    thresholds = load_strategy_thresholds()
     checks = {
         "总分>=4": total_score >= 4,
-        "R<1.70": float(row["r_tech_dividend"]) < 1.70,
-        "CLV>=0.60": float(row["clv_512890"]) >= 0.60,
+        f"R<{thresholds.r_warning:.2f}": float(row["r_tech_dividend"]) < thresholds.r_warning,
+        f"CLV>={thresholds.clv_support:.2f}": float(row["clv_512890"]) >= thresholds.clv_support,
         "未创5日新低": not bool(row["new_5d_low_512890"]),
         "成交额>=5日均额80%": float(row["amount_512890"]) >= float(row["amount_ma5_512890"]) * 0.8,
     }
