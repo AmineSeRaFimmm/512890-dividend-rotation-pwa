@@ -64,10 +64,10 @@
   "current_position_pct": 0,
   "target_position_pct": 0,
   "auto_update": {
-    "source": "512890:eastmoney_direct;588000:eastmoney_direct",
-    "amount_basis": "512890:reported_amount;588000:reported_amount",
+    "source": "512890:sina_direct;588000:sina_direct",
+    "amount_basis": "512890:reported_or_close_times_volume;588000:reported_or_close_times_volume",
     "update_mode": "daily_incremental",
-    "updated_at": "2026-06-23T07:26:43",
+    "updated_at": "2026-06-23T12:48:41",
     "signal_date": "2026-06-23",
     "next_execution": null,
     "executed_trade_from_previous_signal": null,
@@ -79,9 +79,9 @@
       "position_value": 0.0,
       "current_position_ratio": 0.0,
       "pending_order": null,
-      "last_update": "2026-06-23T07:26:43",
+      "last_update": "2026-06-23T12:48:41",
       "signal_state": "S0 空仓等待",
-      "state_days_held": 3,
+      "state_days_held": 4,
       "trade_log": []
     },
     "note": "GitHub Actions每天18:00后生成收盘信号；如有买卖信号，由用户在下一交易日开盘手动执行。自动组合仅用于PWA展示和回测跟踪。"
