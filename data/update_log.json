@@ -1,10 +1,10 @@
 {
-  "last_update": "2026-06-25T12:34:31",
+  "last_update": "2026-06-26T12:28:17",
   "source": "512890:sina_direct;588000:sina_direct",
   "amount_basis": "512890:reported_or_close_times_volume;588000:reported_or_close_times_volume",
   "update_mode": "daily_incremental",
-  "rows": 546,
-  "latest_date": "2026-06-25",
+  "rows": 547,
+  "latest_date": "2026-06-26",
   "lookback_days": 15,
   "data_policy": "bootstrap-history rebuilds the real historical archive once; daily Actions use short-window real-data incremental updates only. Offline sample is local-test only."
 }
