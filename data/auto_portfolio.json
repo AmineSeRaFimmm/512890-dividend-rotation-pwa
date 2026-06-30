@@ -6,8 +6,8 @@
   "position_value": 0.0,
   "current_position_ratio": 0.0,
   "pending_order": null,
-  "last_update": "2026-06-29T14:21:40",
+  "last_update": "2026-06-30T10:06:10",
   "signal_state": "S0 空仓等待",
-  "state_days_held": 8,
+  "state_days_held": 9,
   "trade_log": []
 }
