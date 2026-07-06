@@ -1,41 +1,41 @@
 {
-  "date": "2026-07-03",
+  "date": "2026-07-06",
   "current_state": "S0 空仓等待",
   "target_state": "S0 空仓等待",
   "current_position": 0.0,
   "target_position": 0.0,
-  "total_score": 4,
+  "total_score": 7,
   "action": "HOLD",
   "action_amount": 0.0,
   "action_shares_estimate": null,
   "cards": [
     {
       "name": "相对强弱 R",
-      "value": 1.928,
+      "value": 1.903,
       "score": 0,
       "status": "科技吸血",
-      "detail": "R=1.928，高于1.75，科技相对红利仍强。"
+      "detail": "R=1.903，高于1.75，科技相对红利仍强。"
     },
     {
       "name": "512890趋势",
-      "value": 1.09,
-      "score": 1,
-      "status": "红利止跌",
-      "detail": "512890站上MA5，但未站上MA10。"
+      "value": 1.112,
+      "score": 2,
+      "status": "红利修复",
+      "detail": "512890站上MA10，但未站上MA20。"
     },
     {
       "name": "512890承接 CLV",
-      "value": 0.529,
-      "score": 1,
-      "status": "中性震荡",
-      "detail": "CLV=0.529，承接不强。"
+      "value": 0.935,
+      "score": 2,
+      "status": "有承接",
+      "detail": "CLV=0.935，出现强承接，但连续性不足。"
     },
     {
       "name": "科技拥挤/钝化",
-      "value": 0.351,
-      "score": 2,
-      "status": "科技钝化",
-      "detail": "588000 K_CLV<0.40，出现高位钝化迹象。"
+      "value": 0.726,
+      "score": 3,
+      "status": "科技转弱",
+      "detail": "588000跌破MA5且R均线下行，有利于红利切换。"
     }
   ],
   "reasons": [
@@ -50,18 +50,18 @@
     "stop_loss": false
   },
   "raw": {
-    "r_tech_dividend": 1.9284403669724768,
-    "r_ma3": 2.000059295573664,
+    "r_tech_dividend": 1.9028776978417266,
+    "r_ma3": 1.9269066962444157,
     "r_ma3_falling": true,
-    "close_512890": 1.09,
-    "ma5_512890": 1.0824,
-    "ma10_512890": 1.091,
-    "ma20_512890": 1.12325,
-    "clv_512890": 0.5294117647058855,
-    "close_588000": 2.102,
-    "ma5_588000": 2.2206,
-    "clv_588000": 0.35051546391752386,
-    "market_up_ratio": null
+    "close_512890": 1.112,
+    "ma5_512890": 1.087,
+    "ma10_512890": 1.0908,
+    "ma20_512890": 1.1209,
+    "clv_512890": 0.9354838709677422,
+    "close_588000": 2.116,
+    "ma5_588000": 2.1942,
+    "clv_588000": 0.7264957264957262,
+    "market_up_ratio": 0.34631714971386374
   },
   "current_position_pct": 0,
   "target_position_pct": 0,
@@ -69,8 +69,8 @@
     "source": "512890:eastmoney_direct;588000:eastmoney_direct",
     "amount_basis": "512890:reported_amount;588000:reported_amount",
     "update_mode": "daily_incremental",
-    "updated_at": "2026-07-03T12:20:28",
-    "signal_date": "2026-07-03",
+    "updated_at": "2026-07-06T07:14:54",
+    "signal_date": "2026-07-06",
     "next_execution": null,
     "executed_trade_from_previous_signal": null,
     "portfolio": {
@@ -81,9 +81,9 @@
       "position_value": 0.0,
       "current_position_ratio": 0.0,
       "pending_order": null,
-      "last_update": "2026-07-03T12:20:28",
+      "last_update": "2026-07-06T07:14:54",
       "signal_state": "S0 空仓等待",
-      "state_days_held": 15,
+      "state_days_held": 16,
       "trade_log": []
     },
     "note": "GitHub Actions每天18:00后生成收盘信号；如有买卖信号，由用户在下一交易日开盘手动执行。自动组合仅用于PWA展示和回测跟踪。"
