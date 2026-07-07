@@ -1,5 +1,5 @@
 {
-  "last_update": "2026-07-07T07:05:03",
+  "last_update": "2026-07-07T12:39:47",
   "source": "512890:eastmoney_direct;588000:eastmoney_direct",
   "amount_basis": "512890:reported_amount;588000:reported_amount",
   "update_mode": "daily_incremental",
