@@ -1,7 +1,7 @@
 {
-  "last_update": "2026-07-08T07:09:00",
-  "source": "512890:eastmoney_direct;588000:eastmoney_direct",
-  "amount_basis": "512890:reported_amount;588000:reported_amount",
+  "last_update": "2026-07-08T11:58:53",
+  "source": "512890:sina_direct;588000:sina_direct",
+  "amount_basis": "512890:reported_or_close_times_volume;588000:reported_or_close_times_volume",
   "update_mode": "daily_incremental",
   "rows": 555,
   "latest_date": "2026-07-08",
