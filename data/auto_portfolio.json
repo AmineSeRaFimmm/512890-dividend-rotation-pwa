@@ -5,9 +5,18 @@
   "average_cost": null,
   "position_value": 0.0,
   "current_position_ratio": 0.0,
-  "pending_order": null,
-  "last_update": "2026-07-17T11:42:16",
+  "pending_order": {
+    "signal_date": "2026-07-20",
+    "side": "BUY_512890",
+    "asset": "512890",
+    "planned_amount": 20000.0,
+    "signal_close": 1.172,
+    "estimated_shares_at_signal_close": 17000,
+    "status": "PENDING_NEXT_OPEN",
+    "execution_rule": "T日收盘后出信号，下一交易日开盘执行；买入高开>0.8%降额，高开>1.5%暂缓；卖出直接执行。"
+  },
+  "last_update": "2026-07-20T12:26:42",
   "signal_state": "S0 空仓等待",
-  "state_days_held": 28,
+  "state_days_held": 29,
   "trade_log": []
 }
