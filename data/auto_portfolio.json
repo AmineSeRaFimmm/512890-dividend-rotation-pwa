@@ -1,23 +1,14 @@
 {
   "capital": 100000.0,
-  "cash": 80093.0,
-  "shares_512890": 17000,
-  "average_cost": 1.171,
-  "position_value": 19958.0,
-  "current_position_ratio": 0.19958,
-  "pending_order": {
-    "signal_date": "2026-07-23",
-    "side": "BUY_512890",
-    "asset": "512890",
-    "planned_amount": 20000.0,
-    "signal_close": 1.174,
-    "estimated_shares_at_signal_close": 17000,
-    "status": "PENDING_NEXT_OPEN",
-    "execution_rule": "T日收盘后出信号，下一交易日开盘执行；买入高开>0.8%降额，高开>1.5%暂缓；卖出直接执行。"
-  },
-  "last_update": "2026-07-23T12:03:00",
-  "signal_state": "S1 观察仓",
-  "state_days_held": 3,
+  "cash": 60135.0,
+  "shares_512890": 34000,
+  "average_cost": 1.1725,
+  "position_value": 39508.0,
+  "current_position_ratio": 0.39508,
+  "pending_order": null,
+  "last_update": "2026-07-24T11:56:21",
+  "signal_state": "S2 初步确认",
+  "state_days_held": 1,
   "trade_log": [
     {
       "signal_date": "2026-07-20",
@@ -26,6 +17,17 @@
       "open_price": 1.171,
       "planned_amount": 20000.0,
       "executed_amount": 19907.0,
+      "shares": 17000,
+      "execution_status": "NORMAL_EXECUTE",
+      "execution_reason": "开盘价未高于信号日收盘价0.8%，正常执行。"
+    },
+    {
+      "signal_date": "2026-07-23",
+      "trade_date": "2026-07-24",
+      "side": "BUY",
+      "open_price": 1.174,
+      "planned_amount": 20000.0,
+      "executed_amount": 19958.0,
       "shares": 17000,
       "execution_status": "NORMAL_EXECUTE",
       "execution_reason": "开盘价未高于信号日收盘价0.8%，正常执行。"
