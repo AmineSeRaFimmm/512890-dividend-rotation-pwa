@@ -1,44 +1,46 @@
 {
-  "date": "2026-07-24",
+  "date": "2026-07-27",
   "current_state": "S2 初步确认",
   "target_state": "S2 初步确认",
   "current_position": 0.4,
   "target_position": 0.4,
-  "total_score": 6,
+  "total_score": 11,
   "action": "HOLD",
   "action_amount": 0.0,
   "action_shares_estimate": null,
   "cards": [
     {
       "name": "相对强弱 R",
-      "value": 1.622,
+      "value": 1.638,
       "score": 3,
       "status": "红利确认",
-      "detail": "R=1.622，跌破1.64，科技相对红利优势明显收缩。"
+      "detail": "R=1.638，跌破1.64，科技相对红利优势明显收缩。"
     },
     {
       "name": "512890趋势",
-      "value": 1.162,
-      "score": 0,
-      "status": "红利弱势",
-      "detail": "512890收盘1.162低于MA5=1.167。"
+      "value": 1.167,
+      "score": 3,
+      "status": "红利转强",
+      "detail": "512890站上MA20，且MA5>MA10。"
     },
     {
       "name": "512890承接 CLV",
-      "value": 0.0,
-      "score": 0,
-      "status": "尾盘弱势",
-      "detail": "CLV=0.000，收盘接近日内低位。"
+      "value": 0.692,
+      "score": 2,
+      "status": "有承接",
+      "detail": "CLV=0.692，出现强承接，但连续性不足。"
     },
     {
       "name": "科技拥挤/钝化",
-      "value": 0.432,
+      "value": 0.929,
       "score": 3,
       "status": "科技转弱",
       "detail": "588000跌破MA5且R均线下行，有利于红利切换。"
     }
   ],
-  "reasons": [],
+  "reasons": [
+    "S2→S3：需要R<1.64且3日均线下行、512890站上MA10、连续2日强承接、科技转弱。"
+  ],
   "warnings": [],
   "hard_flags": {
     "strong_rotation": false,
@@ -48,50 +50,40 @@
     "stop_loss": false
   },
   "raw": {
-    "r_tech_dividend": 1.6222030981067126,
-    "r_ma3": 1.634727213343685,
+    "r_tech_dividend": 1.6375321336760926,
+    "r_ma3": 1.6226374679480446,
     "r_ma3_falling": true,
-    "close_512890": 1.162,
-    "ma5_512890": 1.1672,
-    "ma10_512890": 1.154,
-    "ma20_512890": 1.1253,
-    "clv_512890": 0.0,
-    "close_588000": 1.885,
-    "ma5_588000": 1.9118,
-    "clv_588000": 0.43209876543209796,
+    "close_512890": 1.167,
+    "ma5_512890": 1.1662,
+    "ma10_512890": 1.1581,
+    "ma20_512890": 1.1292,
+    "clv_512890": 0.692307692307695,
+    "close_588000": 1.911,
+    "ma5_588000": 1.9309999999999998,
+    "clv_588000": 0.9292929292929303,
     "market_up_ratio": null
   },
   "current_position_pct": 40,
   "target_position_pct": 40,
   "auto_update": {
-    "source": "512890:eastmoney_direct;588000:eastmoney_direct",
-    "amount_basis": "512890:reported_amount;588000:reported_amount",
+    "source": "512890:sina_direct;588000:sina_direct",
+    "amount_basis": "512890:reported_or_close_times_volume;588000:reported_or_close_times_volume",
     "update_mode": "daily_incremental",
-    "updated_at": "2026-07-24T11:56:21",
-    "signal_date": "2026-07-24",
+    "updated_at": "2026-07-27T13:23:33",
+    "signal_date": "2026-07-27",
     "next_execution": null,
-    "executed_trade_from_previous_signal": {
-      "signal_date": "2026-07-23",
-      "trade_date": "2026-07-24",
-      "side": "BUY",
-      "open_price": 1.174,
-      "planned_amount": 20000.0,
-      "executed_amount": 19958.0,
-      "shares": 17000,
-      "execution_status": "NORMAL_EXECUTE",
-      "execution_reason": "开盘价未高于信号日收盘价0.8%，正常执行。"
-    },
+    "executed_trade_from_previous_signal": null,
     "portfolio": {
       "capital": 100000.0,
       "cash": 60135.0,
       "shares_512890": 34000,
       "average_cost": 1.1725,
-      "position_value": 39508.0,
-      "current_position_ratio": 0.39508,
+      "position_value": 39678.0,
+      "current_position_ratio": 0.39678,
       "pending_order": null,
-      "last_update": "2026-07-24T11:56:21",
+      "last_update": "2026-07-27T13:23:33",
       "signal_state": "S2 初步确认",
-      "state_days_held": 1,
+      "state_days_held": 2,
       "trade_log": [
         {
           "signal_date": "2026-07-20",
