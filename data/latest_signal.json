@@ -1,41 +1,41 @@
 {
-  "date": "2026-07-27",
+  "date": "2026-07-28",
   "current_state": "S2 初步确认",
-  "target_state": "S2 初步确认",
+  "target_state": "S3 主仓持有",
   "current_position": 0.4,
-  "target_position": 0.4,
-  "total_score": 11,
-  "action": "HOLD",
-  "action_amount": 0.0,
-  "action_shares_estimate": null,
+  "target_position": 0.7,
+  "total_score": 10,
+  "action": "BUY_512890",
+  "action_amount": 29999.999999999993,
+  "action_shares_estimate": 25500,
   "cards": [
     {
       "name": "相对强弱 R",
-      "value": 1.638,
+      "value": 1.518,
       "score": 3,
       "status": "红利确认",
-      "detail": "R=1.638，跌破1.64，科技相对红利优势明显收缩。"
+      "detail": "R=1.518，跌破1.64，科技相对红利优势明显收缩。"
     },
     {
       "name": "512890趋势",
-      "value": 1.167,
+      "value": 1.176,
       "score": 3,
       "status": "红利转强",
       "detail": "512890站上MA20，且MA5>MA10。"
     },
     {
       "name": "512890承接 CLV",
-      "value": 0.692,
+      "value": 0.941,
       "score": 2,
       "status": "有承接",
-      "detail": "CLV=0.692，出现强承接，但连续性不足。"
+      "detail": "CLV=0.941，出现强承接，但连续性不足。"
     },
     {
       "name": "科技拥挤/钝化",
-      "value": 0.929,
-      "score": 3,
-      "status": "科技转弱",
-      "detail": "588000跌破MA5且R均线下行，有利于红利切换。"
+      "value": 0.133,
+      "score": 2,
+      "status": "科技钝化",
+      "detail": "588000 K_CLV<0.40，出现高位钝化迹象。"
     }
   ],
   "reasons": [
@@ -43,47 +43,65 @@
   ],
   "warnings": [],
   "hard_flags": {
-    "strong_rotation": false,
+    "strong_rotation": true,
     "trend_confirmed": true,
     "support_failed": false,
     "abnormal_drop": false,
     "stop_loss": false
   },
   "raw": {
-    "r_tech_dividend": 1.6375321336760926,
-    "r_ma3": 1.6226374679480446,
+    "r_tech_dividend": 1.5178571428571428,
+    "r_ma3": 1.5925307915466493,
     "r_ma3_falling": true,
-    "close_512890": 1.167,
-    "ma5_512890": 1.1662,
-    "ma10_512890": 1.1581,
-    "ma20_512890": 1.1292,
-    "clv_512890": 0.692307692307695,
-    "close_588000": 1.911,
-    "ma5_588000": 1.9309999999999998,
-    "clv_588000": 0.9292929292929303,
+    "close_512890": 1.176,
+    "ma5_512890": 1.1694,
+    "ma10_512890": 1.1618,
+    "ma20_512890": 1.13465,
+    "clv_512890": 0.9411764705882292,
+    "close_588000": 1.785,
+    "ma5_588000": 1.8847999999999998,
+    "clv_588000": 0.13281249999999936,
     "market_up_ratio": null
   },
   "current_position_pct": 40,
-  "target_position_pct": 40,
+  "target_position_pct": 70,
   "auto_update": {
     "source": "512890:sina_direct;588000:sina_direct",
     "amount_basis": "512890:reported_or_close_times_volume;588000:reported_or_close_times_volume",
     "update_mode": "daily_incremental",
-    "updated_at": "2026-07-27T13:23:33",
-    "signal_date": "2026-07-27",
-    "next_execution": null,
+    "updated_at": "2026-07-28T12:14:47",
+    "signal_date": "2026-07-28",
+    "next_execution": {
+      "signal_date": "2026-07-28",
+      "side": "BUY_512890",
+      "asset": "512890",
+      "planned_amount": 30000.0,
+      "signal_close": 1.176,
+      "estimated_shares_at_signal_close": 25500,
+      "status": "PENDING_NEXT_OPEN",
+      "execution_rule": "T日收盘后出信号，下一交易日开盘执行；买入高开>0.8%降额，高开>1.5%暂缓；卖出直接执行。"
+    },
     "executed_trade_from_previous_signal": null,
     "portfolio": {
       "capital": 100000.0,
       "cash": 60135.0,
       "shares_512890": 34000,
       "average_cost": 1.1725,
-      "position_value": 39678.0,
-      "current_position_ratio": 0.39678,
-      "pending_order": null,
-      "last_update": "2026-07-27T13:23:33",
+      "position_value": 39984.0,
+      "current_position_ratio": 0.39984,
+      "pending_order": {
+        "signal_date": "2026-07-28",
+        "side": "BUY_512890",
+        "asset": "512890",
+        "planned_amount": 30000.0,
+        "signal_close": 1.176,
+        "estimated_shares_at_signal_close": 25500,
+        "status": "PENDING_NEXT_OPEN",
+        "execution_rule": "T日收盘后出信号，下一交易日开盘执行；买入高开>0.8%降额，高开>1.5%暂缓；卖出直接执行。"
+      },
+      "last_update": "2026-07-28T12:14:47",
       "signal_state": "S2 初步确认",
-      "state_days_held": 2,
+      "state_days_held": 3,
       "trade_log": [
         {
           "signal_date": "2026-07-20",
