@@ -3,12 +3,12 @@
   "cash": 184.5,
   "shares_512890": 84700,
   "average_cost": 1.1784592680047226,
-  "position_value": 101978.8,
-  "current_position_ratio": 1.0197880000000001,
+  "position_value": 101894.1,
+  "current_position_ratio": 1.018941,
   "pending_order": null,
-  "last_update": "2026-07-31T12:17:10",
+  "last_update": "2026-08-03T13:20:54",
   "signal_state": "S4 满仓持有",
-  "state_days_held": 1,
+  "state_days_held": 2,
   "trade_log": [
     {
       "signal_date": "2026-07-20",
