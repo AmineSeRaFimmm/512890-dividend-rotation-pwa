@@ -1,38 +1,38 @@
 {
-  "date": "2026-08-21",
+  "date": "2026-08-24",
   "current_state": "S4 满仓持有",
   "target_state": "S4 满仓持有",
   "current_position": 1.0,
   "target_position": 1.0,
-  "total_score": 8,
+  "total_score": 10,
   "action": "HOLD",
   "action_amount": 0.0,
   "action_shares_estimate": null,
   "cards": [
     {
       "name": "相对强弱 R",
-      "value": 1.484,
+      "value": 1.422,
       "score": 3,
       "status": "红利确认",
-      "detail": "R=1.484，跌破1.64，科技相对红利优势明显收缩。"
+      "detail": "R=1.422，跌破1.64，科技相对红利优势明显收缩。"
     },
     {
       "name": "512890趋势",
-      "value": 1.176,
+      "value": 1.189,
       "score": 3,
       "status": "红利转强",
       "detail": "512890站上MA20，且MA5>MA10。"
     },
     {
       "name": "512890承接 CLV",
-      "value": 0.2,
-      "score": 0,
-      "status": "尾盘弱势",
-      "detail": "CLV=0.200，收盘接近日内低位。"
+      "value": 0.947,
+      "score": 2,
+      "status": "有承接",
+      "detail": "CLV=0.947，出现强承接，但连续性不足。"
     },
     {
       "name": "科技拥挤/钝化",
-      "value": 0.378,
+      "value": 0.358,
       "score": 2,
       "status": "科技钝化",
       "detail": "588000 K_CLV<0.40，出现高位钝化迹象。"
@@ -48,17 +48,17 @@
     "stop_loss": false
   },
   "raw": {
-    "r_tech_dividend": 1.483843537414966,
-    "r_ma3": 1.4855950104243298,
+    "r_tech_dividend": 1.4222035323801514,
+    "r_ma3": 1.4600883864659409,
     "r_ma3_falling": true,
-    "close_512890": 1.176,
-    "ma5_512890": 1.1702,
-    "ma10_512890": 1.1646999999999998,
-    "ma20_512890": 1.1727500000000002,
-    "clv_512890": 0.2,
-    "close_588000": 1.745,
-    "ma5_588000": 1.8052,
-    "clv_588000": 0.3783783783783795,
+    "close_512890": 1.189,
+    "ma5_512890": 1.1768,
+    "ma10_512890": 1.1674,
+    "ma20_512890": 1.17385,
+    "clv_512890": 0.9473684210526371,
+    "close_588000": 1.691,
+    "ma5_588000": 1.7658,
+    "clv_588000": 0.35802469135802556,
     "market_up_ratio": null
   },
   "current_position_pct": 100,
@@ -67,31 +67,21 @@
     "source": "512890:sina_direct;588000:sina_direct",
     "amount_basis": "512890:reported_or_close_times_volume;588000:reported_or_close_times_volume",
     "update_mode": "daily_incremental",
-    "updated_at": "2026-08-21T10:48:33",
-    "signal_date": "2026-08-21",
+    "updated_at": "2026-08-24T10:54:42",
+    "signal_date": "2026-08-24",
     "next_execution": null,
-    "executed_trade_from_previous_signal": {
-      "signal_date": "2026-08-20",
-      "trade_date": "2026-08-21",
-      "side": "BUY",
-      "open_price": 1.182,
-      "planned_amount": 30000.0,
-      "executed_amount": 29904.6,
-      "shares": 25300,
-      "execution_status": "NORMAL_EXECUTE",
-      "execution_reason": "开盘价未高于信号日收盘价0.8%，正常执行。"
-    },
+    "executed_trade_from_previous_signal": null,
     "portfolio": {
       "capital": 100000.0,
       "cash": 154.0,
       "shares_512890": 84400,
       "average_cost": 1.1769548042435805,
-      "position_value": 99254.4,
-      "current_position_ratio": 0.992544,
+      "position_value": 100351.6,
+      "current_position_ratio": 1.003516,
       "pending_order": null,
-      "last_update": "2026-08-21T10:48:33",
+      "last_update": "2026-08-24T10:54:42",
       "signal_state": "S4 满仓持有",
-      "state_days_held": 1,
+      "state_days_held": 2,
       "trade_log": [
         {
           "signal_date": "2026-07-20",
