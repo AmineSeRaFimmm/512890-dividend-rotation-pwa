@@ -3,12 +3,12 @@
   "cash": 30058.6,
   "shares_512890": 59100,
   "average_cost": 1.1769548042435805,
-  "position_value": 69974.4,
-  "current_position_ratio": 0.6997439999999999,
+  "position_value": 70447.2,
+  "current_position_ratio": 0.704472,
   "pending_order": null,
-  "last_update": "2026-08-28T21:12:28",
+  "last_update": "2026-08-31T17:38:40",
   "signal_state": "S3 主仓持有",
-  "state_days_held": 3,
+  "state_days_held": 4,
   "trade_log": [
     {
       "signal_date": "2026-07-20",
