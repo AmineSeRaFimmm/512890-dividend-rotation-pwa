@@ -1,38 +1,38 @@
 {
-  "date": "2026-09-22",
+  "date": "2026-09-23",
   "current_state": "S2 初步确认",
   "target_state": "S2 初步确认",
   "current_position": 0.4,
   "target_position": 0.4,
-  "total_score": 7,
+  "total_score": 5,
   "action": "HOLD",
   "action_amount": 0.0,
   "action_shares_estimate": null,
   "cards": [
     {
       "name": "相对强弱 R",
-      "value": 1.481,
+      "value": 1.485,
       "score": 3,
       "status": "红利确认",
-      "detail": "R=1.481，跌破1.64，科技相对红利优势明显收缩。"
+      "detail": "R=1.485，跌破1.64，科技相对红利优势明显收缩。"
     },
     {
       "name": "512890趋势",
-      "value": 1.187,
-      "score": 1,
-      "status": "红利止跌",
-      "detail": "512890站上MA5，但未站上MA10。"
+      "value": 1.182,
+      "score": 0,
+      "status": "红利弱势",
+      "detail": "512890收盘1.182低于MA5=1.185。"
     },
     {
       "name": "512890承接 CLV",
-      "value": 0.9,
-      "score": 2,
-      "status": "有承接",
-      "detail": "CLV=0.900，出现强承接，但连续性不足。"
+      "value": 0.375,
+      "score": 1,
+      "status": "中性震荡",
+      "detail": "CLV=0.375，承接不强。"
     },
     {
       "name": "科技拥挤/钝化",
-      "value": 0.185,
+      "value": 0.286,
       "score": 1,
       "status": "科技放缓",
       "detail": "588000仍在MA5上方，但日内强度下降。"
@@ -48,27 +48,27 @@
     "stop_loss": false
   },
   "raw": {
-    "r_tech_dividend": 1.4810446503791068,
-    "r_ma3": 1.4762408379133127,
+    "r_tech_dividend": 1.484771573604061,
+    "r_ma3": 1.4801737047903423,
     "r_ma3_falling": false,
-    "close_512890": 1.187,
-    "ma5_512890": 1.1862,
-    "ma10_512890": 1.1963000000000001,
-    "ma20_512890": 1.19655,
-    "clv_512890": 0.9000000000000111,
-    "close_588000": 1.758,
-    "ma5_588000": 1.7309999999999999,
-    "clv_588000": 0.18518518518518517,
+    "close_512890": 1.182,
+    "ma5_512890": 1.1845999999999999,
+    "ma10_512890": 1.1934,
+    "ma20_512890": 1.1961,
+    "clv_512890": 0.3749999999999861,
+    "close_588000": 1.755,
+    "ma5_588000": 1.7404,
+    "clv_588000": 0.28571428571427665,
     "market_up_ratio": null
   },
   "current_position_pct": 40,
   "target_position_pct": 40,
   "auto_update": {
-    "source": "512890:eastmoney_direct;588000:eastmoney_direct",
-    "amount_basis": "512890:reported_amount;588000:reported_amount",
+    "source": "512890:sina_direct;588000:sina_direct",
+    "amount_basis": "512890:reported_or_close_times_volume;588000:reported_or_close_times_volume",
     "update_mode": "daily_incremental",
-    "updated_at": "2026-09-22T14:54:58",
-    "signal_date": "2026-09-22",
+    "updated_at": "2026-09-23T15:03:13",
+    "signal_date": "2026-09-23",
     "next_execution": null,
     "executed_trade_from_previous_signal": null,
     "portfolio": {
@@ -76,12 +76,12 @@
       "cash": 60190.9,
       "shares_512890": 33200,
       "average_cost": 1.1964642477450105,
-      "position_value": 39408.4,
-      "current_position_ratio": 0.394084,
+      "position_value": 39242.4,
+      "current_position_ratio": 0.392424,
       "pending_order": null,
-      "last_update": "2026-09-22T14:54:58",
+      "last_update": "2026-09-23T15:03:13",
       "signal_state": "S2 初步确认",
-      "state_days_held": 4,
+      "state_days_held": 5,
       "trade_log": [
         {
           "signal_date": "2026-07-20",
