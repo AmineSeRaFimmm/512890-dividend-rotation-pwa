@@ -6,9 +6,9 @@
   "position_value": 39342.0,
   "current_position_ratio": 0.39342,
   "pending_order": null,
-  "last_update": "2026-09-24T15:06:52",
+  "last_update": "2026-09-25T15:16:39",
   "signal_state": "S2 初步确认",
-  "state_days_held": 6,
+  "state_days_held": 7,
   "trade_log": [
     {
       "signal_date": "2026-07-20",
