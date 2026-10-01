@@ -69,7 +69,7 @@
     "source": "512890:eastmoney_direct;588000:eastmoney_direct",
     "amount_basis": "512890:reported_amount;588000:reported_amount",
     "update_mode": "daily_incremental",
-    "updated_at": "2026-09-30T16:25:07",
+    "updated_at": "2026-10-01T17:02:27",
     "signal_date": "2026-09-30",
     "next_execution": {
       "signal_date": "2026-09-30",
@@ -81,17 +81,7 @@
       "status": "PENDING_NEXT_OPEN",
       "execution_rule": "T日收盘后出信号，下一交易日开盘执行；买入高开>0.8%降额，高开>1.5%暂缓；卖出直接执行。"
     },
-    "executed_trade_from_previous_signal": {
-      "signal_date": "2026-09-29",
-      "trade_date": "2026-09-30",
-      "side": "SELL",
-      "open_price": 1.182,
-      "planned_amount": 20000.0,
-      "executed_amount": 19266.6,
-      "shares": 16300,
-      "execution_status": "NORMAL_EXECUTE",
-      "execution_reason": "卖出信号不设低开保护，T+1开盘执行。"
-    },
+    "executed_trade_from_previous_signal": null,
     "portfolio": {
       "capital": 100000.0,
       "cash": 99416.4,
@@ -109,9 +99,9 @@
         "status": "PENDING_NEXT_OPEN",
         "execution_rule": "T日收盘后出信号，下一交易日开盘执行；买入高开>0.8%降额，高开>1.5%暂缓；卖出直接执行。"
       },
-      "last_update": "2026-09-30T16:25:07",
+      "last_update": "2026-10-01T17:02:27",
       "signal_state": "S0 空仓等待",
-      "state_days_held": 1,
+      "state_days_held": 2,
       "trade_log": [
         {
           "signal_date": "2026-07-20",
