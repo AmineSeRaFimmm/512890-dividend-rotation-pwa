@@ -69,7 +69,7 @@
     "source": "512890:sina_direct;588000:sina_direct",
     "amount_basis": "512890:reported_or_close_times_volume;588000:reported_or_close_times_volume",
     "update_mode": "daily_incremental",
-    "updated_at": "2026-10-02T16:17:50",
+    "updated_at": "2026-10-05T19:19:00",
     "signal_date": "2026-09-30",
     "next_execution": {
       "signal_date": "2026-09-30",
@@ -99,9 +99,9 @@
         "status": "PENDING_NEXT_OPEN",
         "execution_rule": "T日收盘后出信号，下一交易日开盘执行；买入高开>0.8%降额，高开>1.5%暂缓；卖出直接执行。"
       },
-      "last_update": "2026-10-02T16:17:50",
+      "last_update": "2026-10-05T19:19:00",
       "signal_state": "S0 空仓等待",
-      "state_days_held": 3,
+      "state_days_held": 4,
       "trade_log": [
         {
           "signal_date": "2026-07-20",
