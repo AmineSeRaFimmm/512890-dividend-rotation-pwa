@@ -15,9 +15,9 @@
     "status": "PENDING_NEXT_OPEN",
     "execution_rule": "T日收盘后出信号，下一交易日开盘执行；买入高开>0.8%降额，高开>1.5%暂缓；卖出直接执行。"
   },
-  "last_update": "2026-10-05T19:19:00",
+  "last_update": "2026-10-06T16:49:26",
   "signal_state": "S0 空仓等待",
-  "state_days_held": 4,
+  "state_days_held": 5,
   "trade_log": [
     {
       "signal_date": "2026-07-20",
