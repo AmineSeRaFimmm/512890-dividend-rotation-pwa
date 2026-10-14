@@ -3,12 +3,12 @@
   "cash": 59461.5,
   "shares_512890": 33200,
   "average_cost": 1.2034608433734941,
-  "position_value": 40636.8,
-  "current_position_ratio": 0.40636799999999995,
+  "position_value": 40869.2,
+  "current_position_ratio": 0.40869200000000006,
   "pending_order": null,
-  "last_update": "2026-10-13T17:38:47",
+  "last_update": "2026-10-14T15:09:49",
   "signal_state": "S2 初步确认",
-  "state_days_held": 3,
+  "state_days_held": 4,
   "trade_log": [
     {
       "signal_date": "2026-07-20",
