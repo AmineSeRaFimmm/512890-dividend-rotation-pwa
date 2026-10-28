@@ -1,45 +1,45 @@
 {
-  "date": "2026-10-27",
-  "current_state": "S2 初步确认",
+  "date": "2026-10-28",
+  "current_state": "S3 主仓持有",
   "target_state": "S3 主仓持有",
-  "current_position": 0.4,
+  "current_position": 0.7,
   "target_position": 0.7,
-  "total_score": 9,
-  "action": "BUY_512890",
-  "action_amount": 29999.999999999993,
-  "action_shares_estimate": 24500,
+  "total_score": 10,
+  "action": "HOLD",
+  "action_amount": 0.0,
+  "action_shares_estimate": null,
   "cards": [
     {
       "name": "相对强弱 R",
-      "value": 1.078,
+      "value": 1.11,
       "score": 3,
       "status": "红利确认",
-      "detail": "R=1.078，跌破1.64，科技相对红利优势明显收缩。"
+      "detail": "R=1.110，跌破1.64，科技相对红利优势明显收缩。"
     },
     {
       "name": "512890趋势",
-      "value": 1.224,
+      "value": 1.22,
       "score": 1,
       "status": "趋势中性",
       "detail": "512890价格结构未形成明确多头排列。"
     },
     {
       "name": "512890承接 CLV",
-      "value": 0.76,
+      "value": 0.714,
       "score": 3,
       "status": "强承接",
-      "detail": "CLV=0.760，且连续3日强承接。"
+      "detail": "CLV=0.714，且连续4日强承接。"
     },
     {
       "name": "科技拥挤/钝化",
-      "value": 0.012,
-      "score": 2,
-      "status": "科技钝化",
-      "detail": "588000 K_CLV<0.40，出现高位钝化迹象。"
+      "value": 0.61,
+      "score": 3,
+      "status": "科技转弱",
+      "detail": "588000跌破MA5且R均线下行，有利于红利切换。"
     }
   ],
   "reasons": [
-    "S2→S3：需要R<1.64且3日均线下行、512890站上MA10、连续2日强承接、科技转弱。"
+    "S3→S4：需要R<1.59、512890站上MA20、MA5>MA10、科技弱、市场宽度修复。"
   ],
   "warnings": [],
   "hard_flags": {
@@ -50,67 +50,49 @@
     "stop_loss": false
   },
   "raw": {
-    "r_tech_dividend": 1.0784313725490198,
-    "r_ma3": 1.133648094193113,
+    "r_tech_dividend": 1.1098360655737707,
+    "r_ma3": 1.108922341973879,
     "r_ma3_falling": true,
-    "close_512890": 1.224,
-    "ma5_512890": 1.2106000000000001,
-    "ma10_512890": 1.2174,
-    "ma20_512890": 1.2079,
-    "clv_512890": 0.7599999999999989,
-    "close_588000": 1.32,
-    "ma5_588000": 1.3836,
-    "clv_588000": 0.011904761904763226,
+    "close_512890": 1.22,
+    "ma5_512890": 1.212,
+    "ma10_512890": 1.2163,
+    "ma20_512890": 1.20955,
+    "clv_512890": 0.7142857142857143,
+    "close_588000": 1.354,
+    "ma5_588000": 1.3708,
+    "clv_588000": 0.6097560975609767,
     "market_up_ratio": null
   },
-  "current_position_pct": 40,
+  "current_position_pct": 70,
   "target_position_pct": 70,
   "auto_update": {
-    "source": "512890:sina_direct;588000:sina_direct",
-    "amount_basis": "512890:reported_or_close_times_volume;588000:reported_or_close_times_volume",
+    "source": "512890:eastmoney_direct;588000:eastmoney_direct",
+    "amount_basis": "512890:reported_amount;588000:reported_amount",
     "update_mode": "daily_incremental",
-    "updated_at": "2026-10-27T15:54:16",
-    "signal_date": "2026-10-27",
-    "next_execution": {
-      "signal_date": "2026-10-27",
-      "side": "BUY_512890",
-      "asset": "512890",
-      "planned_amount": 30000.0,
-      "signal_close": 1.224,
-      "estimated_shares_at_signal_close": 24500,
-      "status": "PENDING_NEXT_OPEN",
-      "execution_rule": "T日收盘后出信号，下一交易日开盘执行；买入高开>0.8%降额，高开>1.5%暂缓；卖出直接执行。"
-    },
+    "updated_at": "2026-10-28T16:38:05",
+    "signal_date": "2026-10-28",
+    "next_execution": null,
     "executed_trade_from_previous_signal": {
-      "signal_date": "2026-10-26",
-      "trade_date": "2026-10-27",
+      "signal_date": "2026-10-27",
+      "trade_date": "2026-10-28",
       "side": "BUY",
-      "open_price": 1.208,
-      "planned_amount": 20000.0,
-      "executed_amount": 19932.0,
-      "shares": 16500,
+      "open_price": 1.224,
+      "planned_amount": 30000.0,
+      "executed_amount": 29988.0,
+      "shares": 24500,
       "execution_status": "NORMAL_EXECUTE",
       "execution_reason": "开盘价未高于信号日收盘价0.8%，正常执行。"
     },
     "portfolio": {
       "capital": 100000.0,
-      "cash": 59486.0,
-      "shares_512890": 33000,
-      "average_cost": 1.205730421686747,
-      "position_value": 40392.0,
-      "current_position_ratio": 0.40392,
-      "pending_order": {
-        "signal_date": "2026-10-27",
-        "side": "BUY_512890",
-        "asset": "512890",
-        "planned_amount": 30000.0,
-        "signal_close": 1.224,
-        "estimated_shares_at_signal_close": 24500,
-        "status": "PENDING_NEXT_OPEN",
-        "execution_rule": "T日收盘后出信号，下一交易日开盘执行；买入高开>0.8%降额，高开>1.5%暂缓；卖出直接执行。"
-      },
-      "last_update": "2026-10-27T15:54:16",
-      "signal_state": "S2 初步确认",
+      "cash": 29498.0,
+      "shares_512890": 57500,
+      "average_cost": 1.2135148507071765,
+      "position_value": 70150.0,
+      "current_position_ratio": 0.7015,
+      "pending_order": null,
+      "last_update": "2026-10-28T16:38:05",
+      "signal_state": "S3 主仓持有",
       "state_days_held": 1,
       "trade_log": [
         {
@@ -352,6 +334,17 @@
           "planned_amount": 20000.0,
           "executed_amount": 19932.0,
           "shares": 16500,
+          "execution_status": "NORMAL_EXECUTE",
+          "execution_reason": "开盘价未高于信号日收盘价0.8%，正常执行。"
+        },
+        {
+          "signal_date": "2026-10-27",
+          "trade_date": "2026-10-28",
+          "side": "BUY",
+          "open_price": 1.224,
+          "planned_amount": 30000.0,
+          "executed_amount": 29988.0,
+          "shares": 24500,
           "execution_status": "NORMAL_EXECUTE",
           "execution_reason": "开盘价未高于信号日收盘价0.8%，正常执行。"
         }
