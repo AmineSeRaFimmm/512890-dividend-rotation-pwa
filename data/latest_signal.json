@@ -1,38 +1,38 @@
 {
-  "date": "2026-11-05",
+  "date": "2026-11-06",
   "current_state": "S3 主仓持有",
   "target_state": "S3 主仓持有",
   "current_position": 0.7,
   "target_position": 0.7,
-  "total_score": 5,
+  "total_score": 9,
   "action": "HOLD",
   "action_amount": 0.0,
   "action_shares_estimate": null,
   "cards": [
     {
       "name": "相对强弱 R",
-      "value": 1.112,
+      "value": 1.072,
       "score": 3,
       "status": "红利确认",
-      "detail": "R=1.112，跌破1.64，科技相对红利优势明显收缩。"
+      "detail": "R=1.072，跌破1.64，科技相对红利优势明显收缩。"
     },
     {
       "name": "512890趋势",
-      "value": 1.221,
-      "score": 0,
-      "status": "红利弱势",
-      "detail": "512890收盘1.221低于MA5=1.234。"
+      "value": 1.237,
+      "score": 3,
+      "status": "红利转强",
+      "detail": "512890站上MA20，且MA5>MA10。"
     },
     {
       "name": "512890承接 CLV",
-      "value": 0.545,
-      "score": 1,
-      "status": "中性震荡",
-      "detail": "CLV=0.545，承接不强。"
+      "value": 1.0,
+      "score": 2,
+      "status": "有承接",
+      "detail": "CLV=1.000，出现强承接，但连续性不足。"
     },
     {
       "name": "科技拥挤/钝化",
-      "value": 0.557,
+      "value": 0.463,
       "score": 1,
       "status": "科技放缓",
       "detail": "588000仍在MA5上方，但日内强度下降。"
@@ -48,18 +48,18 @@
     "stop_loss": false
   },
   "raw": {
-    "r_tech_dividend": 1.1122031122031122,
-    "r_ma3": 1.0604290325615044,
+    "r_tech_dividend": 1.0719482619240097,
+    "r_ma3": 1.0906045705964866,
     "r_ma3_falling": false,
-    "close_512890": 1.221,
-    "ma5_512890": 1.2342,
-    "ma10_512890": 1.2265000000000001,
-    "ma20_512890": 1.22315,
-    "clv_512890": 0.5454545454545454,
-    "close_588000": 1.358,
-    "ma5_588000": 1.2802000000000002,
-    "clv_588000": 0.5566037735849068,
-    "market_up_ratio": 0.886400873839432
+    "close_512890": 1.237,
+    "ma5_512890": 1.233,
+    "ma10_512890": 1.2301,
+    "ma20_512890": 1.2246000000000001,
+    "clv_512890": 1.0,
+    "close_588000": 1.326,
+    "ma5_588000": 1.2998,
+    "clv_588000": 0.46268656716418,
+    "market_up_ratio": 0.13784324422622296
   },
   "current_position_pct": 70,
   "target_position_pct": 70,
@@ -67,31 +67,21 @@
     "source": "512890:eastmoney_direct;588000:eastmoney_direct",
     "amount_basis": "512890:reported_amount;588000:reported_amount",
     "update_mode": "daily_incremental",
-    "updated_at": "2026-11-05T18:04:07",
-    "signal_date": "2026-11-05",
+    "updated_at": "2026-11-06T17:32:56",
+    "signal_date": "2026-11-06",
     "next_execution": null,
-    "executed_trade_from_previous_signal": {
-      "signal_date": "2026-11-04",
-      "trade_date": "2026-11-05",
-      "side": "SELL",
-      "open_price": 1.23,
-      "planned_amount": 30000.0,
-      "executed_amount": 29889.0,
-      "shares": 24300,
-      "execution_status": "NORMAL_EXECUTE",
-      "execution_reason": "卖出信号不设低开保护，T+1开盘执行。"
-    },
+    "executed_trade_from_previous_signal": null,
     "portfolio": {
       "capital": 100000.0,
       "cash": 29994.4,
       "shares_512890": 57000,
       "average_cost": 1.2248308882238559,
-      "position_value": 69597.0,
-      "current_position_ratio": 0.69597,
+      "position_value": 70509.0,
+      "current_position_ratio": 0.70509,
       "pending_order": null,
-      "last_update": "2026-11-05T18:04:07",
+      "last_update": "2026-11-06T17:32:56",
       "signal_state": "S3 主仓持有",
-      "state_days_held": 1,
+      "state_days_held": 2,
       "trade_log": [
         {
           "signal_date": "2026-07-20",
