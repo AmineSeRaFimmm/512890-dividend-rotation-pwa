@@ -1,10 +1,10 @@
 {
-  "last_update": "2026-11-16T20:29:16",
+  "last_update": "2026-11-17T19:13:26",
   "source": "512890:eastmoney_direct;588000:eastmoney_direct",
   "amount_basis": "512890:reported_amount;588000:reported_amount",
   "update_mode": "daily_incremental",
-  "rows": 642,
-  "latest_date": "2026-11-16",
+  "rows": 643,
+  "latest_date": "2026-11-17",
   "lookback_days": 15,
   "data_policy": "bootstrap-history rebuilds the real historical archive once; daily Actions use short-window real-data incremental updates only. Offline sample is local-test only."
 }
