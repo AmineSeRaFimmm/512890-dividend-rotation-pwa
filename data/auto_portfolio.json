@@ -3,12 +3,21 @@
   "cash": 29951.3,
   "shares_512890": 56300,
   "average_cost": 1.2408985249750923,
-  "position_value": 71275.8,
-  "current_position_ratio": 0.712758,
-  "pending_order": null,
-  "last_update": "2026-11-19T18:59:05",
+  "position_value": 71557.3,
+  "current_position_ratio": 0.7155729999999999,
+  "pending_order": {
+    "signal_date": "2026-11-20",
+    "side": "BUY_512890",
+    "asset": "512890",
+    "planned_amount": 30000.0,
+    "signal_close": 1.271,
+    "estimated_shares_at_signal_close": 23600,
+    "status": "PENDING_NEXT_OPEN",
+    "execution_rule": "T日收盘后出信号，下一交易日开盘执行；买入高开>0.8%降额，高开>1.5%暂缓；卖出直接执行。"
+  },
+  "last_update": "2026-11-20T18:37:20",
   "signal_state": "S3 主仓持有",
-  "state_days_held": 3,
+  "state_days_held": 4,
   "trade_log": [
     {
       "signal_date": "2026-07-20",
