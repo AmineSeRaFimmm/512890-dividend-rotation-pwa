@@ -1,10 +1,10 @@
 {
-  "last_update": "2026-11-20T18:37:20",
-  "source": "512890:sina_direct;588000:sina_direct",
-  "amount_basis": "512890:reported_or_close_times_volume;588000:reported_or_close_times_volume",
+  "last_update": "2026-11-23T22:02:52",
+  "source": "512890:eastmoney_direct;588000:eastmoney_direct",
+  "amount_basis": "512890:reported_amount;588000:reported_amount",
   "update_mode": "daily_incremental",
-  "rows": 646,
-  "latest_date": "2026-11-20",
+  "rows": 647,
+  "latest_date": "2026-11-23",
   "lookback_days": 15,
   "data_policy": "bootstrap-history rebuilds the real historical archive once; daily Actions use short-window real-data incremental updates only. Offline sample is local-test only."
 }
