@@ -6,9 +6,9 @@
   "position_value": 70154.5,
   "current_position_ratio": 0.701545,
   "pending_order": null,
-  "last_update": "2026-11-24T20:40:01",
+  "last_update": "2026-11-25T19:56:45",
   "signal_state": "S3 主仓持有",
-  "state_days_held": 1,
+  "state_days_held": 2,
   "trade_log": [
     {
       "signal_date": "2026-07-20",
